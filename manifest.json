@@ -1,6 +1,6 @@
 {
   "name": "路上ノート",
-  "short_name": "ノート",
+  "short_name": "路上ノート",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
