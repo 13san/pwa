@@ -43,7 +43,7 @@
       margin: 0;
 
       width: 100vw;
-      min-height: 100vh;
+      height: 100vh;
 
       background: #000;
       color: #fff;
@@ -52,7 +52,7 @@
         "Noto Sans JP",
         sans-serif;
 
-      overflow-x: hidden;
+      overflow: hidden;
 
       user-select: none;
       -webkit-user-select: none;
@@ -62,56 +62,70 @@
 
       display: flex;
       flex-direction: column;
+    }
 
-      align-items: center;
+    #captureArea {
+
+      flex: 1;
+
+      display: flex;
+      flex-direction: column;
+
+      min-height: 0;
     }
 
     #topArea {
 
+      position: relative;
+
       width: 100%;
 
-      display: flex;
+      height: 40px;
 
-      align-items: center;
-
-      justify-content: space-between;
-
-      gap: 10px;
-
-      padding:
-        10px
-        16px
-        0
-        16px;
-
-      box-sizing: border-box;
+      margin-top: 8px;
     }
 
     #dateText {
 
+      position: absolute;
+
+      left: 16px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
       font-size: 0.95rem;
 
       white-space: nowrap;
-
-      flex-shrink: 0;
     }
 
     #topText {
 
-      flex: 1;
+      position: absolute;
 
-      text-align: center;
+      left: 50%;
+      top: 50%;
+
+      transform:
+        translate(-50%, -50%);
 
       font-size: 1.45rem;
 
+      text-align: center;
+
+      white-space: nowrap;
+
       cursor: pointer;
-
-      line-height: 1.1;
-
-      word-break: break-word;
     }
 
     #weatherInput {
+
+      position: absolute;
+
+      right: 16px;
+      top: 50%;
+
+      transform: translateY(-50%);
 
       width: 60px;
 
@@ -129,8 +143,6 @@
       outline: none;
 
       font-size: 0.95rem;
-
-      flex-shrink: 0;
     }
 
     #teamName {
@@ -141,7 +153,7 @@
 
       font-size: 1rem;
 
-      margin-top: 2px;
+      margin-top: -2px;
 
       cursor: pointer;
 
@@ -176,16 +188,9 @@
 
     #history {
 
-      width: 100%;
-
       flex: 1;
 
       overflow-y: auto;
-
-      display: flex;
-      flex-direction: column;
-
-      align-items: flex-start;
 
       padding-left: 20px;
       padding-right: 20px;
@@ -239,6 +244,13 @@
       padding: 0;
     }
 
+    #bottomArea {
+
+      width: 100%;
+
+      flex-shrink: 0;
+    }
+
     #saveImageButton {
 
       width: calc(100% - 40px);
@@ -264,13 +276,13 @@
 
       width: calc(100% - 40px);
 
+      height: 90px;
+
       margin:
-        8px
+        0
         20px
         12px
         20px;
-
-      min-height: 90px;
 
       background: #111;
 
@@ -392,7 +404,7 @@
     </div>
 
     <div id="teamName">
-      コンビ名
+      (コンビ名)
     </div>
 
     <div id="middleM">
@@ -401,10 +413,14 @@
 
     <div id="history"></div>
 
-    <textarea
-      id="memoArea"
-      placeholder="メモ"
-    ></textarea>
+    <div id="bottomArea">
+
+      <textarea
+        id="memoArea"
+        placeholder="メモ"
+      ></textarea>
+
+    </div>
 
   </div>
 
@@ -917,7 +933,9 @@
         "flex";
 
       teamInput.value =
-        teamName.textContent;
+        teamName.textContent
+          .replace("(", "")
+          .replace(")", "");
 
       teamInput.focus();
     }
@@ -930,7 +948,7 @@
       if (text !== "") {
 
         teamName.textContent =
-          text;
+          "(" + text + ")";
       }
 
       teamInputArea.style.display =
