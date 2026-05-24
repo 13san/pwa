@@ -183,7 +183,7 @@
 
     .historyItem {
 
-      font-size: 0.98rem;
+      font-size: 1.27rem;
 
       white-space: nowrap;
 
@@ -212,6 +212,27 @@
       outline: none;
 
       padding: 0;
+    }
+
+    #saveImageButton {
+
+      width: calc(100% - 40px);
+
+      margin:
+        6px
+        20px
+        6px
+        20px;
+
+      padding: 10px;
+
+      background: #222;
+
+      color: white;
+
+      border: 1px solid #444;
+
+      font-size: 1rem;
     }
 
     #memoArea {
@@ -340,6 +361,10 @@
 
   <div id="history"></div>
 
+  <button id="saveImageButton">
+    写真
+  </button>
+
   <textarea
     id="memoArea"
     placeholder="メモ"
@@ -406,6 +431,8 @@
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
   <script>
 
     const topText =
@@ -441,6 +468,11 @@
     const submitButton =
       document.getElementById(
         "submitButton"
+      );
+
+    const saveImageButton =
+      document.getElementById(
+        "saveImageButton"
       );
 
     const timeEditArea =
@@ -919,6 +951,67 @@
         event.stopPropagation();
 
         openEditor();
+      }
+    );
+
+    saveImageButton.addEventListener(
+
+      "click",
+
+      async () => {
+
+        const canvas =
+          await html2canvas(
+            document.body,
+            {
+              backgroundColor: "#000"
+            }
+          );
+
+        canvas.toBlob(
+
+          async blob => {
+
+            const file =
+              new File(
+                [blob],
+                "record.png",
+                {
+                  type: "image/png"
+                }
+              );
+
+            if (
+              navigator.canShare &&
+              navigator.canShare({
+                files: [file]
+              })
+            ) {
+
+              await navigator.share({
+
+                files: [file],
+
+                title: "record"
+              });
+
+              return;
+            }
+
+            const link =
+              document.createElement(
+                "a"
+              );
+
+            link.href =
+              URL.createObjectURL(blob);
+
+            link.download =
+              "record.png";
+
+            link.click();
+          }
+        );
       }
     );
 
