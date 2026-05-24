@@ -1,142 +1,1309 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  
+
+  <meta
+    name="viewport"
+    content="
+      width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no,
+      viewport-fit=cover
+    "
+  />
 
   <title>Current Time</title>
 
-  <link rel="manifest" href="manifest.json" />
+  <link
+    rel="manifest"
+    href="manifest.json"
+  />
 
-  <meta name="theme-color" content="#000000" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta
+    name="theme-color"
+    content="#000000"
+  />
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  />
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  />
 
   <style>
+
+    html,
     body {
+
       margin: 0;
-      width: 100vw;
-      height: 100vh;
+
+      width: 100%;
+      height: 100%;
 
       background: #000;
       color: #fff;
 
-      font-family: sans-serif;
-
       overflow: hidden;
-      user-select: none;
+
+      font-family:
+        "Noto Sans JP",
+        sans-serif;
+
       -webkit-user-select: none;
+      user-select: none;
+
+      touch-action: manipulation;
+    }
+
+    body {
+
+      position: fixed;
+
+      inset: 0;
 
       display: flex;
       flex-direction: column;
-      align-items: center;
+    }
+
+    #captureArea {
+
+      width: 100%;
+
+      min-height: 100%;
+
+      display: flex;
+      flex-direction: column;
+
+      box-sizing: border-box;
+
+      overflow: visible;
+
+      padding-bottom: 4px;
+    }
+
+    #topArea {
+
+      position: relative;
+
+      width: 100%;
+
+      height: 36px;
+
+      margin-top: 6px;
+    }
+
+    #dateText {
+
+      position: absolute;
+
+      left: 16px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      font-size: 0.95rem;
     }
 
     #topText {
+
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      transform:
+        translate(-50%, -50%);
+
+      font-size: 1.45rem;
+
+      white-space: nowrap;
+
+      cursor: pointer;
+    }
+
+    #weatherInput {
+
+      position: absolute;
+
+      right: 16px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      width: 70px;
+
+      background: transparent;
+
+      color: white;
+
+      border: none;
+
+      border-bottom:
+        1px solid #666;
+
+      text-align: right;
+
+      outline: none;
+
+      font-size: 0.95rem;
+
+      display: none;
+    }
+
+    #subArea {
+
+      position: relative;
+
       width: 100%;
+
+      height: 22px;
+
+      margin-top: -1px;
+    }
+
+    #teamName {
+
+      position: absolute;
+
+      left: 50%;
+      top: 50%;
+
+      transform:
+        translate(-50%, -50%);
+
+      font-size: 1rem;
+
+      opacity: 0.9;
+
+      cursor: pointer;
+
+      display: none;
+    }
+
+    #middleM {
+
+      position: absolute;
+
+      right: 25px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      font-size: 1rem;
+
+      font-style: italic;
+
+      opacity: 0;
+
+      transition: opacity 0.2s;
+
+      display: none;
+    }
+
+    #history {
+
+      flex: 1;
+
+      overflow-y: auto;
+
+      padding-left: 20px;
+      padding-right: 20px;
+
+      box-sizing: border-box;
+    }
+
+    .historyRow {
+
+      width: 100%;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-top: 2px;
+    }
+
+    .historyItem {
+
+      font-size: 1.27rem;
+
+      line-height: 1.05;
+
+      white-space: nowrap;
+
+      cursor: pointer;
+    }
+
+    .peopleCount {
+
+      width: 42px;
+
+      background: transparent;
+
+      color: white;
+
+      border: none;
+
+      border-bottom:
+        1px solid #666;
+
+      outline: none;
+
       text-align: center;
 
-      font-size: 2rem;
+      font-size: 0.9rem;
 
-      padding-top: 30px;
-      padding-bottom: 20px;
+      padding: 0;
+    }
+
+    #bottomArea {
+
+      width: 100%;
+
+      flex-shrink: 0;
+
+      margin-top: -2px;
+
+      padding-bottom:
+        env(safe-area-inset-bottom);
+    }
+
+    #memoArea {
+
+      width: calc(100% - 40px);
+
+      min-height: 90px;
+
+      margin:
+        0
+        20px
+        4px
+        20px;
+
+      background: #111;
+
+      color: white;
+
+      border:
+        1px solid #333;
+
+      border-radius: 8px;
+
+      resize: none;
+
+      outline: none;
+
+      padding: 8px;
+
+      box-sizing: border-box;
+
+      font-size: 0.95rem;
+
+      line-height: 1.4;
+
+      overflow: hidden;
+
+      white-space: pre-wrap;
 
       word-break: break-word;
     }
 
-    #time {
-      flex: 1;
+    #saveImageButton {
 
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      width: calc(100% - 40px);
 
-      width: 100%;
+      margin:
+        0
+        20px
+        2px
+        20px;
 
-      font-size: 3rem;
+      padding: 8px;
+
+      background: #222;
+
+      color: white;
+
+      border:
+        1px solid #444;
+
+      border-radius: 8px;
+
+      font-size: 1rem;
     }
 
-    #inputArea {
-      position: absolute;
+    #inputArea,
+    #teamInputArea,
+    #timeEditArea,
+    #confirmArea {
 
-      top: 50%;
+      position: fixed;
+
       left: 50%;
+      top: 50%;
 
-      transform: translate(-50%, -50%);
+      transform:
+        translate(-50%, -50%);
+
+      width: 80%;
+      max-width: 400px;
 
       display: flex;
       flex-direction: column;
 
-      gap: 10px;
+      gap: 8px;
 
-      width: 80%;
-      max-width: 400px;
+      background: #111;
+
+      border:
+        1px solid #444;
+
+      padding: 18px;
+
+      box-sizing: border-box;
+
+      z-index: 9999;
+    }
+
+    input,
+    button {
+
+      font-size: 1rem;
+
+      padding: 8px;
+
+      box-sizing: border-box;
     }
 
     input {
-      font-size: 1.2rem;
-      padding: 10px;
-    }
-
-    button {
-      font-size: 1.2rem;
-      padding: 10px;
 
       border: none;
 
-      background: #444;
-      color: white;
+      outline: none;
     }
+
+    button {
+
+      background: #444;
+
+      color: white;
+
+      border: none;
+    }
+
+    .buttonRow {
+
+      display: flex;
+
+      gap: 8px;
+    }
+
+    .buttonRow button {
+
+      flex: 1;
+    }
+
   </style>
+
 </head>
+
 <body>
 
-<div id="topText"></div>
+  <div id="captureArea">
 
-<div id="time">
-  タッチしてください
-</div>
+    <div id="topArea">
 
-<div id="inputArea">
-  <input id="textInput" type="text" placeholder="文字を入力" />
-  <button id="submitButton">決定</button>
-</div>
+      <div id="dateText"></div>
 
-<script>
-  const topText = document.getElementById("topText");
-  const timeElement = document.getElementById("time");
+      <div id="topText"></div>
 
-  const inputArea = document.getElementById("inputArea");
-  const textInput = document.getElementById("textInput");
-  const submitButton = document.getElementById("submitButton");
+      <input
+        id="weatherInput"
+        type="text"
+        placeholder="天気"
+      />
 
-  function updateTime() {
-    const now = new Date();
+    </div>
 
-    const timeString =
-      now.getHours().toString().padStart(2, "0") + ":" +
-      now.getMinutes().toString().padStart(2, "0") + ":" +
-      now.getSeconds().toString().padStart(2, "0");
+    <div id="subArea">
 
-    timeElement.textContent = timeString;
-  }
+      <div id="teamName">
+        (コンビ名)
+      </div>
 
-  submitButton.addEventListener("click", () => {
-    const text = textInput.value;
+      <div id="middleM">
+        M
+      </div>
 
-    topText.textContent = text;
+    </div>
 
-    inputArea.style.display = "none";
-  });
+    <div id="history"></div>
 
-  document.body.addEventListener("touchstart", updateTime);
-  document.body.addEventListener("click", updateTime);
+    <div id="bottomArea">
 
-  // Service Worker 登録
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
-  }
-</script>
+      <textarea
+        id="memoArea"
+        placeholder="メモ"
+      ></textarea>
+
+      <button id="saveImageButton">
+        写真
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="inputArea">
+
+    <input
+      id="textInput"
+      type="text"
+      placeholder="現場名を入力"
+    />
+
+    <button id="submitButton">
+      決定
+    </button>
+
+  </div>
+
+  <div
+    id="teamInputArea"
+    style="display:none;"
+  >
+
+    <input
+      id="teamInput"
+      type="text"
+      placeholder="コンビ名"
+    />
+
+    <button id="teamSubmitButton">
+      決定
+    </button>
+
+  </div>
+
+  <div
+    id="timeEditArea"
+    style="display:none;"
+  >
+
+    <input
+      id="timeEditInput"
+      type="text"
+    />
+
+    <div class="buttonRow">
+
+      <button id="timeEditButton">
+        修正
+      </button>
+
+      <button id="deleteButton">
+        削除
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    id="confirmArea"
+    style="display:none;"
+  >
+
+    <div>
+      本当に削除しますか？
+    </div>
+
+    <div class="buttonRow">
+
+      <button id="confirmDeleteButton">
+        消す
+      </button>
+
+      <button id="cancelDeleteButton">
+        残す
+      </button>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+
+    const captureArea =
+      document.getElementById(
+        "captureArea"
+      );
+
+    const topText =
+      document.getElementById(
+        "topText"
+      );
+
+    const teamName =
+      document.getElementById(
+        "teamName"
+      );
+
+    const middleM =
+      document.getElementById(
+        "middleM"
+      );
+
+    const weatherInput =
+      document.getElementById(
+        "weatherInput"
+      );
+
+    const historyElement =
+      document.getElementById(
+        "history"
+      );
+
+    const memoArea =
+      document.getElementById(
+        "memoArea"
+      );
+
+    const saveImageButton =
+      document.getElementById(
+        "saveImageButton"
+      );
+
+    const dateText =
+      document.getElementById(
+        "dateText"
+      );
+
+    const inputArea =
+      document.getElementById(
+        "inputArea"
+      );
+
+    const textInput =
+      document.getElementById(
+        "textInput"
+      );
+
+    const submitButton =
+      document.getElementById(
+        "submitButton"
+      );
+
+    const teamInputArea =
+      document.getElementById(
+        "teamInputArea"
+      );
+
+    const teamInput =
+      document.getElementById(
+        "teamInput"
+      );
+
+    const teamSubmitButton =
+      document.getElementById(
+        "teamSubmitButton"
+      );
+
+    const timeEditArea =
+      document.getElementById(
+        "timeEditArea"
+      );
+
+    const timeEditInput =
+      document.getElementById(
+        "timeEditInput"
+      );
+
+    const timeEditButton =
+      document.getElementById(
+        "timeEditButton"
+      );
+
+    const deleteButton =
+      document.getElementById(
+        "deleteButton"
+      );
+
+    const confirmArea =
+      document.getElementById(
+        "confirmArea"
+      );
+
+    const confirmDeleteButton =
+      document.getElementById(
+        "confirmDeleteButton"
+      );
+
+    const cancelDeleteButton =
+      document.getElementById(
+        "cancelDeleteButton"
+      );
+
+    let initialized =
+      false;
+
+    let startTime =
+      null;
+
+    let historyCount =
+      0;
+
+    let editingItem =
+      null;
+
+    let touchTimer =
+      null;
+
+    const TOUCH_DELAY =
+      20;
+
+    const numbers = [
+
+      "①","②","③","④","⑤",
+      "⑥","⑦","⑧","⑨","⑩",
+      "⑪","⑫","⑬","⑭","⑮",
+      "⑯","⑰","⑱","⑲","⑳",
+      "㉑","㉒","㉓","㉔","㉕",
+      "㉖","㉗","㉘","㉙","㉚",
+      "㉛","㉜","㉝","㉞","㉟",
+      "㊱","㊲","㊳","㊴","㊵",
+      "㊶","㊷","㊸","㊹","㊺",
+      "㊻","㊼","㊽","㊾","㊿"
+    ];
+
+    function autoResizeMemo() {
+
+      memoArea.style.height =
+        "auto";
+
+      memoArea.style.height =
+        memoArea.scrollHeight + "px";
+    }
+
+    memoArea.addEventListener(
+      "input",
+      autoResizeMemo
+    );
+
+    function updateDate() {
+
+      const now =
+        new Date();
+
+      const y =
+        now.getFullYear();
+
+      const m =
+        String(
+          now.getMonth() + 1
+        ).padStart(2, "0");
+
+      const d =
+        String(
+          now.getDate()
+        ).padStart(2, "0");
+
+      dateText.textContent =
+        `${y}/${m}/${d}`;
+    }
+
+    updateDate();
+
+    function getNumberText(index) {
+
+      if (
+        index < numbers.length
+      ) {
+
+        return numbers[index];
+      }
+
+      return (index + 1) + ".";
+    }
+
+    function getCurrentTime() {
+
+      const now =
+        new Date();
+
+      return (
+
+        now
+          .getHours()
+          .toString()
+          .padStart(2, "0")
+
+        + ":"
+
+        +
+
+        now
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")
+
+        + ":"
+
+        +
+
+        now
+          .getSeconds()
+          .toString()
+          .padStart(2, "0")
+      );
+    }
+
+    function updateAllNumbers() {
+
+      const rows =
+        document.querySelectorAll(
+          ".historyRow"
+        );
+
+      rows.forEach(
+        (row, index) => {
+
+          const item =
+            row.querySelector(
+              ".historyItem"
+            );
+
+          item.textContent =
+
+            getNumberText(index)
+
+            +
+
+            item.textContent.substring(1);
+        }
+      );
+
+      historyCount =
+        rows.length;
+    }
+
+    function createHistoryRow(text) {
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+      row.className =
+        "historyRow";
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "historyItem";
+
+      item.textContent =
+        text;
+
+      item.addEventListener(
+        "click",
+        () => {
+
+          editingItem =
+            item;
+
+          timeEditInput.value =
+            item.textContent;
+
+          timeEditArea.style.display =
+            "flex";
+        }
+      );
+
+      const people =
+        document.createElement(
+          "input"
+        );
+
+      people.className =
+        "peopleCount";
+
+      people.type =
+        "number";
+
+      people.placeholder =
+        "人数";
+
+      people.inputMode =
+        "numeric";
+
+      row.appendChild(item);
+
+      row.appendChild(people);
+
+      historyElement.appendChild(
+        row
+      );
+    }
+
+    function enableMiddleM() {
+
+      middleM.style.display =
+        "block";
+
+      middleM.style.opacity =
+        "0.9";
+    }
+
+    function startTimeRecord() {
+
+      if (
+        !initialized
+      ) {
+        return;
+      }
+
+      if (
+        startTime !== null
+      ) {
+        return;
+      }
+
+      startTime =
+        getCurrentTime();
+
+      historyCount++;
+
+      createHistoryRow(
+
+        getNumberText(
+          historyCount - 1
+        )
+
+        +
+
+        startTime
+
+        +
+
+        "~"
+      );
+
+      enableMiddleM();
+    }
+
+    function endTimeRecord() {
+
+      if (
+        !initialized
+      ) {
+        return;
+      }
+
+      if (
+        startTime === null
+      ) {
+        return;
+      }
+
+      const items =
+        document.querySelectorAll(
+          ".historyItem"
+        );
+
+      const item =
+        items[
+          items.length - 1
+        ];
+
+      if (
+        item &&
+        item.textContent.endsWith("~")
+      ) {
+
+        item.textContent +=
+          getCurrentTime();
+      }
+
+      startTime =
+        null;
+    }
+
+    function closeEditor() {
+
+      const text =
+        textInput.value.trim();
+
+      if (
+        text === ""
+      ) {
+        return;
+      }
+
+      topText.textContent =
+        text;
+
+      weatherInput.style.display =
+        "block";
+
+      teamName.style.display =
+        "block";
+
+      inputArea.style.display =
+        "none";
+
+      initialized =
+        true;
+    }
+
+    function closeTeamEditor() {
+
+      const text =
+        teamInput.value.trim();
+
+      if (
+        text !== ""
+      ) {
+
+        teamName.textContent =
+          "(" + text + ")";
+      }
+
+      teamInputArea.style.display =
+        "none";
+    }
+
+    function closeTimeEditor() {
+
+      if (
+        editingItem === null
+      ) {
+        return;
+      }
+
+      editingItem.textContent =
+
+        editingItem.textContent.charAt(0)
+
+        +
+
+        timeEditInput.value.substring(1);
+
+      editingItem =
+        null;
+
+      timeEditArea.style.display =
+        "none";
+
+      updateAllNumbers();
+    }
+
+    function openDeleteConfirm() {
+
+      timeEditArea.style.display =
+        "none";
+
+      confirmArea.style.display =
+        "flex";
+    }
+
+    function confirmDelete() {
+
+      if (
+        editingItem === null
+      ) {
+        return;
+      }
+
+      const row =
+        editingItem.closest(
+          ".historyRow"
+        );
+
+      if (row) {
+
+        row.remove();
+      }
+
+      editingItem =
+        null;
+
+      confirmArea.style.display =
+        "none";
+
+      updateAllNumbers();
+    }
+
+    function cancelDelete() {
+
+      confirmArea.style.display =
+        "none";
+
+      editingItem =
+        null;
+    }
+
+    submitButton.addEventListener(
+      "click",
+      closeEditor
+    );
+
+    teamSubmitButton.addEventListener(
+      "click",
+      closeTeamEditor
+    );
+
+    topText.addEventListener(
+      "click",
+      () => {
+
+        inputArea.style.display =
+          "flex";
+
+        textInput.value =
+          topText.textContent;
+      }
+    );
+
+    teamName.addEventListener(
+      "click",
+      () => {
+
+        teamInputArea.style.display =
+          "flex";
+
+        teamInput.value =
+          "";
+      }
+    );
+
+    timeEditButton.addEventListener(
+      "click",
+      closeTimeEditor
+    );
+
+    deleteButton.addEventListener(
+      "click",
+      openDeleteConfirm
+    );
+
+    confirmDeleteButton.addEventListener(
+      "click",
+      confirmDelete
+    );
+
+    cancelDeleteButton.addEventListener(
+      "click",
+      cancelDelete
+    );
+
+    document.body.addEventListener(
+
+      "touchstart",
+
+      event => {
+
+        clearTimeout(
+          touchTimer
+        );
+
+        const count =
+          event.touches.length;
+
+        touchTimer =
+          setTimeout(() => {
+
+            if (
+              count === 3
+            ) {
+
+              event.preventDefault();
+
+              startTimeRecord();
+            }
+
+            if (
+              count === 4
+            ) {
+
+              event.preventDefault();
+
+              endTimeRecord();
+            }
+
+          }, TOUCH_DELAY);
+      },
+
+      { passive: false }
+    );
+
+    document.body.addEventListener(
+      "touchend",
+      () => {
+
+        clearTimeout(
+          touchTimer
+        );
+      }
+    );
+
+    document.addEventListener(
+
+      "keydown",
+
+      event => {
+
+        if (
+          event.key ===
+          "AudioVolumeUp"
+        ) {
+
+          startTimeRecord();
+        }
+
+        if (
+          event.key ===
+          "AudioVolumeDown"
+        ) {
+
+          endTimeRecord();
+        }
+      }
+    );
+
+    saveImageButton.addEventListener(
+
+      "click",
+
+      async () => {
+
+        saveImageButton.style.visibility =
+          "hidden";
+
+        historyElement.style.overflow =
+          "visible";
+
+        const oldHeight =
+          captureArea.style.height;
+
+        captureArea.style.height =
+          "auto";
+
+        await new Promise(
+          resolve =>
+            requestAnimationFrame(
+              resolve
+            )
+        );
+
+        const canvas =
+          await html2canvas(
+            captureArea,
+            {
+              backgroundColor:
+                "#000",
+
+              useCORS: true,
+
+              width:
+                captureArea.scrollWidth,
+
+              height:
+                captureArea.scrollHeight,
+
+              windowWidth:
+                captureArea.scrollWidth,
+
+              windowHeight:
+                captureArea.scrollHeight,
+
+              scrollX: 0,
+              scrollY: 0
+            }
+          );
+
+        captureArea.style.height =
+          oldHeight;
+
+        saveImageButton.style.visibility =
+          "visible";
+
+        canvas.toBlob(
+
+          async blob => {
+
+            const file =
+              new File(
+                [blob],
+                "record.png",
+                {
+                  type:
+                    "image/png"
+                }
+              );
+
+            if (
+              navigator.canShare &&
+              navigator.canShare({
+                files: [file]
+              })
+            ) {
+
+              await navigator.share({
+
+                files: [file],
+
+                title:
+                  "record"
+              });
+
+              return;
+            }
+
+            const link =
+              document.createElement(
+                "a"
+              );
+
+            link.href =
+              URL.createObjectURL(
+                blob
+              );
+
+            link.download =
+              "record.png";
+
+            link.click();
+          }
+        );
+      }
+    );
+
+    if (
+      "serviceWorker"
+      in navigator
+    ) {
+
+      navigator
+        .serviceWorker
+        .register("./sw.js");
+    }
+
+  </script>
 
 </body>
 </html>
