@@ -66,12 +66,12 @@
 
     #captureArea {
 
-      flex: 1;
+      width: 100%;
+
+      min-height: 100%;
 
       display: flex;
       flex-direction: column;
-
-      min-height: 0;
     }
 
     #topArea {
@@ -80,7 +80,7 @@
 
       width: 100%;
 
-      height: 40px;
+      height: 42px;
 
       margin-top: 8px;
     }
@@ -143,47 +143,58 @@
       outline: none;
 
       font-size: 0.95rem;
+
+      display: none;
+    }
+
+    #subArea {
+
+      position: relative;
+
+      width: 100%;
+
+      height: 26px;
     }
 
     #teamName {
 
-      width: 100%;
+      position: absolute;
 
-      text-align: center;
+      left: 50%;
+      top: 50%;
+
+      transform:
+        translate(-50%, -50%);
 
       font-size: 1rem;
-
-      margin-top: -2px;
 
       cursor: pointer;
 
       opacity: 0.9;
+
+      display: none;
     }
 
     #middleM {
 
-      width: 100%;
+      position: absolute;
 
-      text-align: right;
+      right: 25px;
+      top: 50%;
 
-      padding-right: 25px;
-
-      box-sizing: border-box;
+      transform: translateY(-50%);
 
       font-size: 1.4rem;
 
       font-style: italic;
 
-      margin-top: -2px;
-      margin-bottom: 2px;
-
       opacity: 0;
 
       transition: opacity 0.2s;
 
-      pointer-events: none;
-
       line-height: 1;
+
+      display: none;
     }
 
     #history {
@@ -196,6 +207,8 @@
       padding-right: 20px;
 
       box-sizing: border-box;
+
+      padding-bottom: 10px;
     }
 
     .historyRow {
@@ -403,12 +416,14 @@
 
     </div>
 
-    <div id="teamName">
-      (コンビ名)
-    </div>
+    <div id="subArea">
 
-    <div id="middleM">
-      M
+      <div id="teamName"></div>
+
+      <div id="middleM">
+        M
+      </div>
+
     </div>
 
     <div id="history"></div>
@@ -451,6 +466,7 @@
       id="teamInput"
       type="text"
       placeholder="コンビ名"
+      value=""
     />
 
     <button id="teamSubmitButton">
@@ -549,6 +565,11 @@
     const middleM =
       document.getElementById(
         "middleM"
+      );
+
+    const weatherInput =
+      document.getElementById(
+        "weatherInput"
       );
 
     const historyElement =
@@ -767,6 +788,9 @@
 
     function enableMiddleM() {
 
+      middleM.style.display =
+        "block";
+
       middleM.style.opacity =
         "0.9";
     }
@@ -921,6 +945,12 @@
       topText.textContent =
         text;
 
+      weatherInput.style.display =
+        "block";
+
+      teamName.style.display =
+        "block";
+
       inputArea.style.display =
         "none";
 
@@ -932,10 +962,7 @@
       teamInputArea.style.display =
         "flex";
 
-      teamInput.value =
-        teamName.textContent
-          .replace("(", "")
-          .replace(")", "");
+      teamInput.value = "";
 
       teamInput.focus();
     }
@@ -1088,11 +1115,17 @@
         const originalOverflow =
           memoArea.style.overflow;
 
+        const originalHistoryOverflow =
+          historyElement.style.overflow;
+
         memoArea.style.height =
           memoArea.scrollHeight + "px";
 
         memoArea.style.overflow =
           "hidden";
+
+        historyElement.style.overflow =
+          "visible";
 
         const memoMirror =
           document.createElement(
@@ -1147,7 +1180,22 @@
           await html2canvas(
             captureArea,
             {
-              backgroundColor: "#000"
+              backgroundColor: "#000",
+
+              width:
+                captureArea.scrollWidth,
+
+              height:
+                captureArea.scrollHeight,
+
+              windowWidth:
+                captureArea.scrollWidth,
+
+              windowHeight:
+                captureArea.scrollHeight,
+
+              scrollX: 0,
+              scrollY: 0
             }
           );
 
@@ -1161,6 +1209,9 @@
 
         memoArea.style.overflow =
           originalOverflow;
+
+        historyElement.style.overflow =
+          originalHistoryOverflow;
 
         canvas.toBlob(
 
