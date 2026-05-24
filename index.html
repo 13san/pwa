@@ -72,15 +72,17 @@
 
       display: flex;
 
+      align-items: center;
+
       justify-content: space-between;
 
-      align-items: flex-start;
+      gap: 10px;
 
       padding:
-        12px
-        18px
+        10px
+        16px
         0
-        18px;
+        16px;
 
       box-sizing: border-box;
     }
@@ -89,14 +91,29 @@
 
       font-size: 0.95rem;
 
-      opacity: 0.9;
-
       white-space: nowrap;
+
+      flex-shrink: 0;
+    }
+
+    #topText {
+
+      flex: 1;
+
+      text-align: center;
+
+      font-size: 1.45rem;
+
+      cursor: pointer;
+
+      line-height: 1.1;
+
+      word-break: break-word;
     }
 
     #weatherInput {
 
-      width: 80px;
+      width: 60px;
 
       background: transparent;
 
@@ -112,23 +129,23 @@
       outline: none;
 
       font-size: 0.95rem;
+
+      flex-shrink: 0;
     }
 
-    #topText {
+    #teamName {
 
       width: 100%;
 
       text-align: center;
 
-      font-size: 1.8rem;
+      font-size: 1rem;
 
-      margin-top: -8px;
-
-      word-break: break-word;
+      margin-top: 2px;
 
       cursor: pointer;
 
-      line-height: 1.1;
+      opacity: 0.9;
     }
 
     #middleM {
@@ -253,7 +270,7 @@
         12px
         20px;
 
-      min-height: 70px;
+      min-height: 90px;
 
       background: #111;
 
@@ -272,9 +289,14 @@
       outline: none;
 
       overflow: auto;
+
+      white-space: pre-wrap;
+
+      line-height: 1.4;
     }
 
     #inputArea,
+    #teamInputArea,
     #timeEditArea,
     #confirmArea {
 
@@ -353,34 +375,42 @@
 
 <body>
 
-  <div id="topArea">
+  <div id="captureArea">
 
-    <div id="dateText"></div>
+    <div id="topArea">
 
-    <input
-      id="weatherInput"
-      type="text"
-      placeholder="天気"
-    />
+      <div id="dateText"></div>
+
+      <div id="topText"></div>
+
+      <input
+        id="weatherInput"
+        type="text"
+        placeholder="天気"
+      />
+
+    </div>
+
+    <div id="teamName">
+      コンビ名
+    </div>
+
+    <div id="middleM">
+      M
+    </div>
+
+    <div id="history"></div>
+
+    <textarea
+      id="memoArea"
+      placeholder="メモ"
+    ></textarea>
 
   </div>
-
-  <div id="topText"></div>
-
-  <div id="middleM">
-    M
-  </div>
-
-  <div id="history"></div>
 
   <button id="saveImageButton">
     写真
   </button>
-
-  <textarea
-    id="memoArea"
-    placeholder="メモ"
-  ></textarea>
 
   <div id="inputArea">
 
@@ -391,6 +421,23 @@
     />
 
     <button id="submitButton">
+      決定
+    </button>
+
+  </div>
+
+  <div
+    id="teamInputArea"
+    style="display:none;"
+  >
+
+    <input
+      id="teamInput"
+      type="text"
+      placeholder="コンビ名"
+    />
+
+    <button id="teamSubmitButton">
       決定
     </button>
 
@@ -448,38 +495,39 @@
   <script>
 
     document.addEventListener(
-
       "gesturestart",
-
       event => {
-
         event.preventDefault();
       }
     );
 
     document.addEventListener(
-
       "gesturechange",
-
       event => {
-
         event.preventDefault();
       }
     );
 
     document.addEventListener(
-
       "gestureend",
-
       event => {
-
         event.preventDefault();
       }
     );
+
+    const captureArea =
+      document.getElementById(
+        "captureArea"
+      );
 
     const topText =
       document.getElementById(
         "topText"
+      );
+
+    const teamName =
+      document.getElementById(
+        "teamName"
       );
 
     const middleM =
@@ -510,6 +558,21 @@
     const submitButton =
       document.getElementById(
         "submitButton"
+      );
+
+    const teamInputArea =
+      document.getElementById(
+        "teamInputArea"
+      );
+
+    const teamInput =
+      document.getElementById(
+        "teamInput"
+      );
+
+    const teamSubmitButton =
+      document.getElementById(
+        "teamSubmitButton"
       );
 
     const saveImageButton =
@@ -848,6 +911,32 @@
       initialized = true;
     }
 
+    function openTeamEditor() {
+
+      teamInputArea.style.display =
+        "flex";
+
+      teamInput.value =
+        teamName.textContent;
+
+      teamInput.focus();
+    }
+
+    function closeTeamEditor() {
+
+      const text =
+        teamInput.value.trim();
+
+      if (text !== "") {
+
+        teamName.textContent =
+          text;
+      }
+
+      teamInputArea.style.display =
+        "none";
+    }
+
     function closeTimeEditor() {
 
       if (
@@ -925,74 +1014,42 @@
     }
 
     submitButton.addEventListener(
-
       "click",
-
       closeEditor
     );
 
-    textInput.addEventListener(
+    teamSubmitButton.addEventListener(
+      "click",
+      closeTeamEditor
+    );
 
-      "keydown",
-
-      event => {
-
-        if (
-          event.key === "Enter"
-        ) {
-
-          closeEditor();
-        }
-      }
+    teamName.addEventListener(
+      "click",
+      openTeamEditor
     );
 
     timeEditButton.addEventListener(
-
       "click",
-
       closeTimeEditor
     );
 
     deleteButton.addEventListener(
-
       "click",
-
       openDeleteConfirm
     );
 
     confirmDeleteButton.addEventListener(
-
       "click",
-
       confirmDelete
     );
 
     cancelDeleteButton.addEventListener(
-
       "click",
-
       cancelDelete
     );
 
-    timeEditInput.addEventListener(
-
-      "keydown",
-
-      event => {
-
-        if (
-          event.key === "Enter"
-        ) {
-
-          closeTimeEditor();
-        }
-      }
-    );
-
     topText.addEventListener(
-
       "click",
-
       event => {
 
         event.stopPropagation();
@@ -1019,40 +1076,73 @@
         memoArea.style.overflow =
           "hidden";
 
-        const originalBodyHeight =
-          document.body.style.height;
+        const memoMirror =
+          document.createElement(
+            "div"
+          );
 
-        document.body.style.height =
-          "auto";
+        memoMirror.style.width =
+          memoArea.offsetWidth + "px";
 
-        window.scrollTo(0, 0);
+        memoMirror.style.minHeight =
+          memoArea.scrollHeight + "px";
+
+        memoMirror.style.background =
+          "#111";
+
+        memoMirror.style.color =
+          "white";
+
+        memoMirror.style.border =
+          "1px solid #333";
+
+        memoMirror.style.padding =
+          "8px";
+
+        memoMirror.style.boxSizing =
+          "border-box";
+
+        memoMirror.style.whiteSpace =
+          "pre-wrap";
+
+        memoMirror.style.wordBreak =
+          "break-word";
+
+        memoMirror.style.fontSize =
+          "0.95rem";
+
+        memoMirror.style.lineHeight =
+          "1.4";
+
+        memoMirror.textContent =
+          memoArea.value;
+
+        memoArea.style.display =
+          "none";
+
+        memoArea.parentNode.insertBefore(
+          memoMirror,
+          memoArea
+        );
 
         const canvas =
           await html2canvas(
-            document.body,
+            captureArea,
             {
-
-              backgroundColor: "#000",
-
-              windowWidth:
-                document.body.scrollWidth,
-
-              windowHeight:
-                document.body.scrollHeight,
-
-              height:
-                document.body.scrollHeight
+              backgroundColor: "#000"
             }
           );
+
+        memoMirror.remove();
+
+        memoArea.style.display =
+          "block";
 
         memoArea.style.height =
           originalHeight;
 
         memoArea.style.overflow =
           originalOverflow;
-
-        document.body.style.height =
-          originalBodyHeight;
 
         canvas.toBlob(
 
