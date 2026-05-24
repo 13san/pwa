@@ -2,15 +2,33 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <title>Current Time</title>
 
-  <link rel="manifest" href="manifest.json" />
+  <link
+    rel="manifest"
+    href="manifest.json"
+  />
 
-  <meta name="theme-color" content="#000000" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta
+    name="theme-color"
+    content="#000000"
+  />
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  />
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  />
 
   <style>
 
@@ -24,15 +42,18 @@
       background: #000;
       color: #fff;
 
-      font-family: sans-serif;
+      font-family:
+        "Noto Sans JP",
+        sans-serif;
 
-      overflow-x: hidden;
+      overflow: hidden;
 
       user-select: none;
       -webkit-user-select: none;
 
       display: flex;
       flex-direction: column;
+
       align-items: center;
     }
 
@@ -62,16 +83,23 @@
 
       display: flex;
       flex-direction: column;
-      align-items: center;
 
+      align-items: flex-start;
+
+      padding-left: 20px;
+      padding-right: 20px;
       padding-bottom: 30px;
+
+      box-sizing: border-box;
     }
 
     .historyItem {
 
-      font-size: 1.2rem;
+      font-size: 1rem;
 
       margin-top: 10px;
+
+      white-space: nowrap;
     }
 
     #inputArea {
@@ -97,6 +125,10 @@
       font-size: 1.2rem;
 
       padding: 10px;
+
+      border: none;
+
+      outline: none;
     }
 
     button {
@@ -109,11 +141,12 @@
 
       background: #444;
 
-      color: white;
+      color: #fff;
     }
 
   </style>
 </head>
+
 <body>
 
   <div id="topText"></div>
@@ -137,19 +170,29 @@
   <script>
 
     const topText =
-      document.getElementById("topText");
+      document.getElementById(
+        "topText"
+      );
 
     const historyElement =
-      document.getElementById("history");
+      document.getElementById(
+        "history"
+      );
 
     const inputArea =
-      document.getElementById("inputArea");
+      document.getElementById(
+        "inputArea"
+      );
 
     const textInput =
-      document.getElementById("textInput");
+      document.getElementById(
+        "textInput"
+      );
 
     const submitButton =
-      document.getElementById("submitButton");
+      document.getElementById(
+        "submitButton"
+      );
 
     let initialized = false;
 
@@ -157,17 +200,62 @@
 
     let historyCount = 0;
 
+    const numbers = [
+
+      "①","②","③","④","⑤",
+      "⑥","⑦","⑧","⑨","⑩",
+
+      "⑪","⑫","⑬","⑭","⑮",
+      "⑯","⑰","⑱","⑲","⑳",
+
+      "㉑","㉒","㉓","㉔","㉕",
+      "㉖","㉗","㉘","㉙","㉚",
+
+      "㉛","㉜","㉝","㉞","㉟",
+
+      "㊱","㊲","㊳","㊴","㊵",
+
+      "㊶","㊷","㊸","㊹","㊺",
+      "㊻","㊼","㊽","㊾","㊿"
+    ];
+
     function getCurrentTime() {
 
       const now = new Date();
 
       return (
-        now.getHours().toString().padStart(2, "0")
-        + ":" +
-        now.getMinutes().toString().padStart(2, "0")
-        + ":" +
-        now.getSeconds().toString().padStart(2, "0")
+
+        now
+          .getHours()
+          .toString()
+          .padStart(2, "0")
+
+        + ":"
+
+        +
+
+        now
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")
+
+        + ":"
+
+        +
+
+        now
+          .getSeconds()
+          .toString()
+          .padStart(2, "0")
       );
+    }
+
+    function vibrate() {
+
+      if (navigator.vibrate) {
+
+        navigator.vibrate(50);
+      }
     }
 
     function addTimeHistory() {
@@ -176,104 +264,84 @@
         return;
       }
 
-      // 開始時間未設定
+      vibrate();
+
+      // 開始時間
       if (startTime === null) {
 
-        startTime = getCurrentTime();
+        startTime =
+          getCurrentTime();
+
+        historyCount++;
+
+        const item =
+          document.createElement(
+            "div"
+          );
+
+        item.className =
+          "historyItem";
+
+        let numberText = "";
+
+        if (
+          historyCount <=
+          numbers.length
+        ) {
+
+          numberText =
+            numbers[
+              historyCount - 1
+            ];
+
+        } else {
+
+          numberText =
+            historyCount + ".";
+        }
+
+        item.textContent =
+
+          numberText +
+          startTime +
+          "~";
+
+        item.id =
+          "history-" +
+          historyCount;
+
+        historyElement.appendChild(
+          item
+        );
 
         return;
       }
 
-      // 終了時間取得
-      const endTime = getCurrentTime();
-
-      historyCount++;
+      // 終了時間
+      const endTime =
+        getCurrentTime();
 
       const item =
-        document.createElement("div");
+        document.getElementById(
+          "history-" +
+          historyCount
+        );
 
-      item.className = "historyItem";
+      if (item) {
 
-      let numberText = "";
+        item.textContent =
 
-      const numbers = [
-        "①",
-        "②",
-        "③",
-        "④",
-        "⑤",
-        "⑥",
-        "⑦",
-        "⑧",
-        "⑨",
-        "⑩",
-        "⑪",
-        "⑫",
-        "⑬",
-        "⑭",
-        "⑮",
-        "⑯",
-        "⑰",
-        "⑱",
-        "⑲",
-        "⑳",
-        "㉑",
-        "㉒",
-        "㉓",
-        "㉔",
-        "㉕",
-        "㉖",
-        "㉗",
-        "㉘",
-        "㉙",
-        "㉚",
-        "㉛",
-        "㉜",
-        "㉝",
-        "㉞",
-        "㉟",
-        "㊱",
-        "㊲",
-        "㊳",
-        "㊴",
-        "㊵",
-        "㊶",
-        "㊷",
-        "㊸",
-        "㊹",
-        "㊺",
-        "㊻",
-        "㊼",
-        "㊽",
-        "㊾",
-        "㊿"
-      ];
-
-      if (historyCount <= numbers.length) {
-
-        numberText =
-          numbers[historyCount - 1];
-
-      } else {
-
-        numberText =
-          historyCount + ".";
+          item.textContent +
+          endTime;
       }
-
-      item.textContent =
-        numberText +
-        startTime +
-        "~" +
-        endTime;
-
-      historyElement.prepend(item);
 
       startTime = null;
     }
 
     function openEditor() {
 
-      inputArea.style.display = "flex";
+      inputArea.style.display =
+        "flex";
 
       textInput.value =
         topText.textContent;
@@ -290,20 +358,41 @@
         return;
       }
 
-      topText.textContent = text;
+      topText.textContent =
+        text;
 
-      inputArea.style.display = "none";
+      inputArea.style.display =
+        "none";
 
       initialized = true;
     }
 
     submitButton.addEventListener(
+
       "click",
+
       closeEditor
     );
 
+    textInput.addEventListener(
+
+      "keydown",
+
+      event => {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          closeEditor();
+        }
+      }
+    );
+
     topText.addEventListener(
+
       "click",
+
       event => {
 
         event.stopPropagation();
@@ -313,22 +402,30 @@
     );
 
     document.body.addEventListener(
+
       "touchstart",
+
       event => {
 
-        if (event.touches.length === 3) {
+        if (
+          event.touches.length === 3
+        ) {
+
+          event.preventDefault();
 
           addTimeHistory();
         }
-      }
+      },
+
+      { passive: false }
     );
 
     // Service Worker 登録
     if ("serviceWorker" in navigator) {
 
-      navigator.serviceWorker.register(
-        "./sw.js"
-      );
+      navigator
+        .serviceWorker
+        .register("./sw.js");
     }
 
   </script>
