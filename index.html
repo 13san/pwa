@@ -24,6 +24,7 @@
       font-family: sans-serif;
 
       overflow: hidden;
+
       user-select: none;
       -webkit-user-select: none;
 
@@ -34,6 +35,7 @@
 
     #topText {
       width: 100%;
+
       text-align: center;
 
       font-size: 2rem;
@@ -42,16 +44,18 @@
       padding-bottom: 20px;
 
       word-break: break-word;
+
+      cursor: pointer;
     }
 
     #time {
       flex: 1;
 
+      width: 100%;
+
       display: flex;
       justify-content: center;
       align-items: center;
-
-      width: 100%;
 
       font-size: 3rem;
     }
@@ -59,7 +63,7 @@
     #inputArea {
       position: absolute;
 
-      top: 50%;
+      top: 60%;
       left: 50%;
 
       transform: translate(-50%, -50%);
@@ -94,7 +98,7 @@
 <div id="topText"></div>
 
 <div id="time">
-  タッチしてください!!!
+  タッチしてください
 </div>
 
 <div id="inputArea">
@@ -110,7 +114,14 @@
   const textInput = document.getElementById("textInput");
   const submitButton = document.getElementById("submitButton");
 
+  let initialized = false;
+
   function updateTime() {
+
+    if (!initialized) {
+      return;
+    }
+
     const now = new Date();
 
     const timeString =
@@ -121,15 +132,40 @@
     timeElement.textContent = timeString;
   }
 
-  submitButton.addEventListener("click", () => {
-    const text = textInput.value;
+  function openEditor() {
+    inputArea.style.display = "flex";
+
+    textInput.value = topText.textContent;
+
+    textInput.focus();
+  }
+
+  function closeEditor() {
+
+    const text = textInput.value.trim();
+
+    if (text === "") {
+      return;
+    }
 
     topText.textContent = text;
 
     inputArea.style.display = "none";
+
+    initialized = true;
+  }
+
+  submitButton.addEventListener("click", closeEditor);
+
+  topText.addEventListener("click", event => {
+
+    event.stopPropagation();
+
+    openEditor();
   });
 
   document.body.addEventListener("touchstart", updateTime);
+
   document.body.addEventListener("click", updateTime);
 
   // Service Worker 登録
