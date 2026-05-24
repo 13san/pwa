@@ -88,7 +88,7 @@
       font-style: italic;
 
       margin-top: -5px;
-      margin-bottom: 15px;
+      margin-bottom: 7px;
 
       opacity: 0;
 
@@ -112,7 +112,6 @@
 
       padding-left: 20px;
       padding-right: 20px;
-      padding-bottom: 30px;
 
       box-sizing: border-box;
     }
@@ -141,17 +140,52 @@
 
     .peopleCount {
 
+      width: 55px;
+
+      font-size: 0.95rem;
+
+      background: transparent;
+
+      color: white;
+
+      border: none;
+
+      border-bottom:
+        1px solid #777;
+
+      text-align: center;
+
+      outline: none;
+    }
+
+    #memoArea {
+
+      width: calc(100% - 40px);
+
+      margin: 15px 20px 20px 20px;
+
+      min-height: 90px;
+
+      background: #111;
+
+      color: white;
+
+      border: 1px solid #444;
+
+      resize: none;
+
+      padding: 10px;
+
+      box-sizing: border-box;
+
       font-size: 1rem;
 
-      cursor: pointer;
-
-      min-width: 50px;
-
-      text-align: right;
+      outline: none;
     }
 
     #inputArea,
-    #timeEditArea {
+    #timeEditArea,
+    #confirmArea {
 
       position: absolute;
 
@@ -175,6 +209,13 @@
       border: 1px solid #444;
 
       box-sizing: border-box;
+    }
+
+    #confirmText {
+
+      text-align: center;
+
+      font-size: 1rem;
     }
 
     input {
@@ -227,6 +268,11 @@
 
   <div id="history"></div>
 
+  <textarea
+    id="memoArea"
+    placeholder="メモ"
+  ></textarea>
+
   <div id="inputArea">
 
     <input
@@ -259,6 +305,29 @@
 
       <button id="deleteButton">
         削除
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    id="confirmArea"
+    style="display:none;"
+  >
+
+    <div id="confirmText">
+      本当に削除しますか？
+    </div>
+
+    <div class="buttonRow">
+
+      <button id="confirmDeleteButton">
+        消す
+      </button>
+
+      <button id="cancelDeleteButton">
+        残す
       </button>
 
     </div>
@@ -315,6 +384,21 @@
     const deleteButton =
       document.getElementById(
         "deleteButton"
+      );
+
+    const confirmArea =
+      document.getElementById(
+        "confirmArea"
+      );
+
+    const confirmDeleteButton =
+      document.getElementById(
+        "confirmDeleteButton"
+      );
+
+    const cancelDeleteButton =
+      document.getElementById(
+        "cancelDeleteButton"
       );
 
     let initialized = false;
@@ -404,16 +488,13 @@
               ".historyItem"
             );
 
-          const text =
-            item.textContent;
-
           item.textContent =
 
             getNumberText(index)
 
             +
 
-            text.substring(1);
+            item.textContent.substring(1);
         }
       );
 
@@ -474,7 +555,7 @@
 
       people.type = "number";
 
-      people.placeholder = "[人数]";
+      people.placeholder = "人数";
 
       people.inputMode =
         "numeric";
@@ -542,11 +623,8 @@
           items.length - 1
         ];
 
-      if (!item) {
-        return;
-      }
-
       if (
+        item &&
         item.textContent.endsWith("~")
       ) {
 
@@ -594,19 +672,13 @@
         return;
       }
 
-      const currentText =
-        editingItem.textContent;
+      editingItem.textContent =
 
-      const fixedText =
-
-        currentText.charAt(0)
+        editingItem.textContent.charAt(0)
 
         +
 
         timeEditInput.value.substring(1);
-
-      editingItem.textContent =
-        fixedText;
 
       timeEditArea.style.display =
         "none";
@@ -616,7 +688,16 @@
       updateAllNumbers();
     }
 
-    function deleteTimeItem() {
+    function openDeleteConfirm() {
+
+      timeEditArea.style.display =
+        "none";
+
+      confirmArea.style.display =
+        "flex";
+    }
+
+    function confirmDelete() {
 
       if (
         editingItem === null
@@ -636,7 +717,7 @@
 
       editingItem = null;
 
-      timeEditArea.style.display =
+      confirmArea.style.display =
         "none";
 
       updateAllNumbers();
@@ -649,6 +730,14 @@
         middleM.style.opacity =
           "0";
       }
+    }
+
+    function cancelDelete() {
+
+      confirmArea.style.display =
+        "none";
+
+      editingItem = null;
     }
 
     submitButton.addEventListener(
@@ -684,7 +773,21 @@
 
       "click",
 
-      deleteTimeItem
+      openDeleteConfirm
+    );
+
+    confirmDeleteButton.addEventListener(
+
+      "click",
+
+      confirmDelete
+    );
+
+    cancelDeleteButton.addEventListener(
+
+      "click",
+
+      cancelDelete
     );
 
     timeEditInput.addEventListener(
