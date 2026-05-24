@@ -77,7 +77,11 @@
 
       width: 100%;
 
-      text-align: center;
+      text-align: right;
+
+      padding-right: 25px;
+
+      box-sizing: border-box;
 
       font-size: 1.6rem;
 
@@ -113,15 +117,37 @@
       box-sizing: border-box;
     }
 
+    .historyRow {
+
+      width: 100%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-top: 10px;
+    }
+
     .historyItem {
 
       font-size: 1rem;
 
-      margin-top: 10px;
-
       white-space: nowrap;
 
       cursor: pointer;
+    }
+
+    .peopleCount {
+
+      font-size: 1rem;
+
+      cursor: pointer;
+
+      min-width: 50px;
+
+      text-align: right;
     }
 
     #inputArea,
@@ -223,7 +249,6 @@
     <input
       id="timeEditInput"
       type="text"
-      placeholder="①12:34:56~12:40:00"
     />
 
     <div class="buttonRow">
@@ -366,30 +391,34 @@
 
     function updateAllNumbers() {
 
-      const items =
+      const rows =
         document.querySelectorAll(
-          ".historyItem"
+          ".historyRow"
         );
 
-      items.forEach(
-        (item, index) => {
+      rows.forEach(
+        (row, index) => {
+
+          const item =
+            row.querySelector(
+              ".historyItem"
+            );
 
           const text =
             item.textContent;
 
-          const replaced =
-            text.replace(
-              /^[^\d]*?/,
-              getNumberText(index)
-            );
-
           item.textContent =
-            replaced;
+
+            getNumberText(index)
+
+            +
+
+            text.substring(1);
         }
       );
 
       historyCount =
-        items.length;
+        rows.length;
     }
 
     function enableMiddleM() {
@@ -398,20 +427,15 @@
         "0.9";
     }
 
-    function startTimeRecord() {
+    function createHistoryRow(text) {
 
-      if (!initialized) {
-        return;
-      }
+      const row =
+        document.createElement(
+          "div"
+        );
 
-      if (startTime !== null) {
-        return;
-      }
-
-      startTime =
-        getCurrentTime();
-
-      historyCount++;
+      row.className =
+        "historyRow";
 
       const item =
         document.createElement(
@@ -422,18 +446,7 @@
         "historyItem";
 
       item.textContent =
-
-        getNumberText(
-          historyCount - 1
-        )
-
-        +
-
-        startTime
-
-        +
-
-        "~";
+        text;
 
       item.addEventListener(
         "click",
@@ -451,9 +464,60 @@
         }
       );
 
+      const people =
+        document.createElement(
+          "input"
+        );
+
+      people.className =
+        "peopleCount";
+
+      people.type = "number";
+
+      people.placeholder = "[人数]";
+
+      people.inputMode =
+        "numeric";
+
+      row.appendChild(item);
+
+      row.appendChild(people);
+
       historyElement.appendChild(
-        item
+        row
       );
+    }
+
+    function startTimeRecord() {
+
+      if (!initialized) {
+        return;
+      }
+
+      if (startTime !== null) {
+        return;
+      }
+
+      startTime =
+        getCurrentTime();
+
+      historyCount++;
+
+      const text =
+
+        getNumberText(
+          historyCount - 1
+        )
+
+        +
+
+        startTime
+
+        +
+
+        "~";
+
+      createHistoryRow(text);
 
       enableMiddleM();
     }
@@ -483,20 +547,11 @@
       }
 
       if (
-        item.textContent.includes("~")
+        item.textContent.endsWith("~")
       ) {
 
-        const split =
-          item.textContent.split("~");
-
-        if (
-          split[1] === ""
-        ) {
-
-          item.textContent =
-            item.textContent +
-            getCurrentTime();
-        }
+        item.textContent +=
+          getCurrentTime();
       }
 
       startTime = null;
@@ -539,8 +594,19 @@
         return;
       }
 
+      const currentText =
+        editingItem.textContent;
+
+      const fixedText =
+
+        currentText.charAt(0)
+
+        +
+
+        timeEditInput.value.substring(1);
+
       editingItem.textContent =
-        timeEditInput.value;
+        fixedText;
 
       timeEditArea.style.display =
         "none";
@@ -558,7 +624,15 @@
         return;
       }
 
-      editingItem.remove();
+      const row =
+        editingItem.closest(
+          ".historyRow"
+        );
+
+      if (row) {
+
+        row.remove();
+      }
 
       editingItem = null;
 
@@ -656,7 +730,6 @@
         touchTimer =
           setTimeout(() => {
 
-            // 3本指
             if (
               touchCount === 3
             ) {
@@ -666,7 +739,6 @@
               startTimeRecord();
             }
 
-            // 4本指
             if (
               touchCount === 4
             ) {
@@ -694,7 +766,6 @@
       }
     );
 
-    // Service Worker 登録
     if ("serviceWorker" in navigator) {
 
       navigator
