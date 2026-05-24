@@ -1,108 +1,337 @@
-<script>
-  const topText = document.getElementById("topText");
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  const historyElement = document.getElementById("history");
+  <title>Current Time</title>
 
-  const inputArea = document.getElementById("inputArea");
-  const textInput = document.getElementById("textInput");
-  const submitButton = document.getElementById("submitButton");
+  <link rel="manifest" href="manifest.json" />
 
-  let initialized = false;
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  let startTime = null;
+  <style>
 
-  let historyCount = 0;
+    body {
 
-  function getCurrentTime() {
+      margin: 0;
 
-    const now = new Date();
+      width: 100vw;
+      height: 100vh;
 
-    return (
-      now.getHours().toString().padStart(2, "0") + ":" +
-      now.getMinutes().toString().padStart(2, "0") + ":" +
-      now.getSeconds().toString().padStart(2, "0")
+      background: #000;
+      color: #fff;
+
+      font-family: sans-serif;
+
+      overflow-x: hidden;
+
+      user-select: none;
+      -webkit-user-select: none;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #topText {
+
+      width: 100%;
+
+      text-align: center;
+
+      font-size: 2rem;
+
+      padding-top: 30px;
+      padding-bottom: 20px;
+
+      word-break: break-word;
+
+      cursor: pointer;
+    }
+
+    #history {
+
+      width: 100%;
+
+      flex: 1;
+
+      overflow-y: auto;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      padding-bottom: 30px;
+    }
+
+    .historyItem {
+
+      font-size: 1.2rem;
+
+      margin-top: 10px;
+    }
+
+    #inputArea {
+
+      position: absolute;
+
+      top: 60%;
+      left: 50%;
+
+      transform: translate(-50%, -50%);
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 10px;
+
+      width: 80%;
+      max-width: 400px;
+    }
+
+    input {
+
+      font-size: 1.2rem;
+
+      padding: 10px;
+    }
+
+    button {
+
+      font-size: 1.2rem;
+
+      padding: 10px;
+
+      border: none;
+
+      background: #444;
+
+      color: white;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="topText"></div>
+
+  <div id="history"></div>
+
+  <div id="inputArea">
+
+    <input
+      id="textInput"
+      type="text"
+      placeholder="文字を入力"
+    />
+
+    <button id="submitButton">
+      決定
+    </button>
+
+  </div>
+
+  <script>
+
+    const topText =
+      document.getElementById("topText");
+
+    const historyElement =
+      document.getElementById("history");
+
+    const inputArea =
+      document.getElementById("inputArea");
+
+    const textInput =
+      document.getElementById("textInput");
+
+    const submitButton =
+      document.getElementById("submitButton");
+
+    let initialized = false;
+
+    let startTime = null;
+
+    let historyCount = 0;
+
+    function getCurrentTime() {
+
+      const now = new Date();
+
+      return (
+        now.getHours().toString().padStart(2, "0")
+        + ":" +
+        now.getMinutes().toString().padStart(2, "0")
+        + ":" +
+        now.getSeconds().toString().padStart(2, "0")
+      );
+    }
+
+    function addTimeHistory() {
+
+      if (!initialized) {
+        return;
+      }
+
+      // 開始時間未設定
+      if (startTime === null) {
+
+        startTime = getCurrentTime();
+
+        return;
+      }
+
+      // 終了時間取得
+      const endTime = getCurrentTime();
+
+      historyCount++;
+
+      const item =
+        document.createElement("div");
+
+      item.className = "historyItem";
+
+      let numberText = "";
+
+      const numbers = [
+        "①",
+        "②",
+        "③",
+        "④",
+        "⑤",
+        "⑥",
+        "⑦",
+        "⑧",
+        "⑨",
+        "⑩",
+        "⑪",
+        "⑫",
+        "⑬",
+        "⑭",
+        "⑮",
+        "⑯",
+        "⑰",
+        "⑱",
+        "⑲",
+        "⑳",
+        "㉑",
+        "㉒",
+        "㉓",
+        "㉔",
+        "㉕",
+        "㉖",
+        "㉗",
+        "㉘",
+        "㉙",
+        "㉚",
+        "㉛",
+        "㉜",
+        "㉝",
+        "㉞",
+        "㉟",
+        "㊱",
+        "㊲",
+        "㊳",
+        "㊴",
+        "㊵",
+        "㊶",
+        "㊷",
+        "㊸",
+        "㊹",
+        "㊺",
+        "㊻",
+        "㊼",
+        "㊽",
+        "㊾",
+        "㊿"
+      ];
+
+      if (historyCount <= numbers.length) {
+
+        numberText =
+          numbers[historyCount - 1];
+
+      } else {
+
+        numberText =
+          historyCount + ".";
+      }
+
+      item.textContent =
+        numberText +
+        startTime +
+        "~" +
+        endTime;
+
+      historyElement.prepend(item);
+
+      startTime = null;
+    }
+
+    function openEditor() {
+
+      inputArea.style.display = "flex";
+
+      textInput.value =
+        topText.textContent;
+
+      textInput.focus();
+    }
+
+    function closeEditor() {
+
+      const text =
+        textInput.value.trim();
+
+      if (text === "") {
+        return;
+      }
+
+      topText.textContent = text;
+
+      inputArea.style.display = "none";
+
+      initialized = true;
+    }
+
+    submitButton.addEventListener(
+      "click",
+      closeEditor
     );
-  }
 
-  function addTimeHistory() {
+    topText.addEventListener(
+      "click",
+      event => {
 
-    if (!initialized) {
-      return;
+        event.stopPropagation();
+
+        openEditor();
+      }
+    );
+
+    document.body.addEventListener(
+      "touchstart",
+      event => {
+
+        if (event.touches.length === 3) {
+
+          addTimeHistory();
+        }
+      }
+    );
+
+    // Service Worker 登録
+    if ("serviceWorker" in navigator) {
+
+      navigator.serviceWorker.register(
+        "./sw.js"
+      );
     }
 
-    // 開始時間未設定
-    if (startTime === null) {
+  </script>
 
-      startTime = getCurrentTime();
-
-      return;
-    }
-
-    // 終了時間取得
-    const endTime = getCurrentTime();
-
-    historyCount++;
-
-    const item = document.createElement("div");
-
-    item.className = "historyItem";
-
-    item.textContent =
-      "①②③④⑤⑥⑦⑧⑨⑩"[historyCount - 1] ||
-      `${historyCount}.`
-      ;
-
-    item.textContent +=
-      startTime + "~" + endTime;
-
-    historyElement.prepend(item);
-
-    startTime = null;
-  }
-
-  function openEditor() {
-
-    inputArea.style.display = "flex";
-
-    textInput.value = topText.textContent;
-
-    textInput.focus();
-  }
-
-  function closeEditor() {
-
-    const text = textInput.value.trim();
-
-    if (text === "") {
-      return;
-    }
-
-    topText.textContent = text;
-
-    inputArea.style.display = "none";
-
-    initialized = true;
-  }
-
-  submitButton.addEventListener("click", closeEditor);
-
-  topText.addEventListener("click", event => {
-
-    event.stopPropagation();
-
-    openEditor();
-  });
-
-  document.body.addEventListener("touchstart", event => {
-
-    if (event.touches.length === 3) {
-
-      addTimeHistory();
-    }
-  });
-
-  // Service Worker 登録
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
-  }
-</script>
+</body>
+</html>
