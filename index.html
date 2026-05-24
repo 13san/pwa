@@ -75,7 +75,7 @@
 
       overflow: visible;
 
-      padding-bottom: 6px;
+      padding-bottom: 4px;
 
       box-sizing: border-box;
     }
@@ -273,46 +273,23 @@
 
       flex-shrink: 0;
 
-      padding-top: 2px;
+      padding-top: 0px;
 
-      padding-bottom: 2px;
-    }
+      padding-bottom: 0px;
 
-    #saveImageButton {
-
-      width: calc(100% - 40px);
-
-      margin:
-        0
-        20px
-        4px
-        20px;
-
-      padding: 8px;
-
-      background: #222;
-
-      color: white;
-
-      border: 1px solid #444;
-
-      border-radius: 8px;
-
-      font-size: 1rem;
-
-      box-sizing: border-box;
+      margin-top: -2px;
     }
 
     #memoArea {
 
       width: calc(100% - 40px);
 
-      height: 72px;
+      min-height: 90px;
 
       margin:
         0
         20px
-        0
+        4px
         20px;
 
       background: #111;
@@ -333,11 +310,36 @@
 
       outline: none;
 
-      overflow: auto;
+      overflow: hidden;
 
       white-space: pre-wrap;
 
       line-height: 1.4;
+    }
+
+    #saveImageButton {
+
+      width: calc(100% - 40px);
+
+      margin:
+        0
+        20px
+        2px
+        20px;
+
+      padding: 8px;
+
+      background: #222;
+
+      color: white;
+
+      border: 1px solid #444;
+
+      border-radius: 8px;
+
+      font-size: 1rem;
+
+      box-sizing: border-box;
     }
 
     #inputArea,
@@ -452,14 +454,14 @@
 
     <div id="bottomArea">
 
-      <button id="saveImageButton">
-        写真
-      </button>
-
       <textarea
         id="memoArea"
         placeholder="メモ"
       ></textarea>
+
+      <button id="saveImageButton">
+        写真
+      </button>
 
     </div>
 
@@ -715,6 +717,20 @@
     }
 
     updateDate();
+
+    function autoResizeMemo() {
+
+      memoArea.style.height =
+        "auto";
+
+      memoArea.style.height =
+        memoArea.scrollHeight + "px";
+    }
+
+    memoArea.addEventListener(
+      "input",
+      autoResizeMemo
+    );
 
     function getNumberText(index) {
 
@@ -1112,26 +1128,8 @@
         saveImageButton.style.display =
           "none";
 
-        const originalMemoHeight =
-          memoArea.style.height;
-
-        const originalMemoOverflow =
-          memoArea.style.overflow;
-
-        const originalHistoryOverflow =
-          historyElement.style.overflow;
-
-        memoArea.style.height =
-          memoArea.scrollHeight + "px";
-
-        memoArea.style.overflow =
-          "hidden";
-
         historyElement.style.overflow =
           "visible";
-
-        const totalHeight =
-          captureArea.scrollHeight;
 
         const canvas =
           await html2canvas(
@@ -1143,13 +1141,13 @@
                 captureArea.scrollWidth,
 
               height:
-                totalHeight,
+                captureArea.scrollHeight,
 
               windowWidth:
                 captureArea.scrollWidth,
 
               windowHeight:
-                totalHeight,
+                captureArea.scrollHeight,
 
               scrollX: 0,
               scrollY: 0
@@ -1158,15 +1156,6 @@
 
         saveImageButton.style.display =
           "block";
-
-        memoArea.style.height =
-          originalMemoHeight;
-
-        memoArea.style.overflow =
-          originalMemoOverflow;
-
-        historyElement.style.overflow =
-          originalHistoryOverflow;
 
         canvas.toBlob(
 
