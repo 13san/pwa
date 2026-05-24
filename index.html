@@ -86,7 +86,9 @@
       margin-top: -5px;
       margin-bottom: 15px;
 
-      opacity: 0.9;
+      opacity: 0;
+
+      transition: opacity 0.2s;
 
       pointer-events: none;
     }
@@ -162,7 +164,7 @@
 
     button {
 
-      font-size: 1.2rem;
+      font-size: 1.1rem;
 
       padding: 10px;
 
@@ -173,6 +175,18 @@
       color: #fff;
     }
 
+    .buttonRow {
+
+      display: flex;
+
+      gap: 10px;
+    }
+
+    .buttonRow button {
+
+      flex: 1;
+    }
+
   </style>
 
 </head>
@@ -181,7 +195,9 @@
 
   <div id="topText"></div>
 
-  <div id="middleM">M</div>
+  <div id="middleM">
+    M
+  </div>
 
   <div id="history"></div>
 
@@ -210,9 +226,17 @@
       placeholder="①12:34:56~12:40:00"
     />
 
-    <button id="timeEditButton">
-      修正
-    </button>
+    <div class="buttonRow">
+
+      <button id="timeEditButton">
+        修正
+      </button>
+
+      <button id="deleteButton">
+        削除
+      </button>
+
+    </div>
 
   </div>
 
@@ -221,6 +245,11 @@
     const topText =
       document.getElementById(
         "topText"
+      );
+
+    const middleM =
+      document.getElementById(
+        "middleM"
       );
 
     const historyElement =
@@ -258,6 +287,11 @@
         "timeEditButton"
       );
 
+    const deleteButton =
+      document.getElementById(
+        "deleteButton"
+      );
+
     let initialized = false;
 
     let startTime = null;
@@ -265,6 +299,10 @@
     let historyCount = 0;
 
     let editingItem = null;
+
+    let touchTimer = null;
+
+    const TOUCH_DELAY = 20;
 
     const numbers = [
 
@@ -284,6 +322,16 @@
       "㊶","㊷","㊸","㊹","㊺",
       "㊻","㊼","㊽","㊾","㊿"
     ];
+
+    function getNumberText(index) {
+
+      if (index < numbers.length) {
+
+        return numbers[index];
+      }
+
+      return (index + 1) + ".";
+    }
 
     function getCurrentTime() {
 
@@ -316,6 +364,40 @@
       );
     }
 
+    function updateAllNumbers() {
+
+      const items =
+        document.querySelectorAll(
+          ".historyItem"
+        );
+
+      items.forEach(
+        (item, index) => {
+
+          const text =
+            item.textContent;
+
+          const replaced =
+            text.replace(
+              /^[^\d]*?/,
+              getNumberText(index)
+            );
+
+          item.textContent =
+            replaced;
+        }
+      );
+
+      historyCount =
+        items.length;
+    }
+
+    function enableMiddleM() {
+
+      middleM.style.opacity =
+        "0.9";
+    }
+
     function startTimeRecord() {
 
       if (!initialized) {
@@ -339,33 +421,19 @@
       item.className =
         "historyItem";
 
-      let numberText = "";
-
-      if (
-        historyCount <=
-        numbers.length
-      ) {
-
-        numberText =
-          numbers[
-            historyCount - 1
-          ];
-
-      } else {
-
-        numberText =
-          historyCount + ".";
-      }
-
       item.textContent =
 
-        numberText +
-        startTime +
-        "~";
+        getNumberText(
+          historyCount - 1
+        )
 
-      item.id =
-        "history-" +
-        historyCount;
+        +
+
+        startTime
+
+        +
+
+        "~";
 
       item.addEventListener(
         "click",
@@ -386,6 +454,8 @@
       historyElement.appendChild(
         item
       );
+
+      enableMiddleM();
     }
 
     function endTimeRecord() {
@@ -398,20 +468,35 @@
         return;
       }
 
-      const endTime =
-        getCurrentTime();
-
-      const item =
-        document.getElementById(
-          "history-" +
-          historyCount
+      const items =
+        document.querySelectorAll(
+          ".historyItem"
         );
 
-      if (item) {
+      const item =
+        items[
+          items.length - 1
+        ];
 
-        item.textContent =
-          item.textContent +
-          endTime;
+      if (!item) {
+        return;
+      }
+
+      if (
+        item.textContent.includes("~")
+      ) {
+
+        const split =
+          item.textContent.split("~");
+
+        if (
+          split[1] === ""
+        ) {
+
+          item.textContent =
+            item.textContent +
+            getCurrentTime();
+        }
       }
 
       startTime = null;
@@ -461,6 +546,35 @@
         "none";
 
       editingItem = null;
+
+      updateAllNumbers();
+    }
+
+    function deleteTimeItem() {
+
+      if (
+        editingItem === null
+      ) {
+        return;
+      }
+
+      editingItem.remove();
+
+      editingItem = null;
+
+      timeEditArea.style.display =
+        "none";
+
+      updateAllNumbers();
+
+      if (
+        historyElement.children
+          .length === 0
+      ) {
+
+        middleM.style.opacity =
+          "0";
+      }
     }
 
     submitButton.addEventListener(
@@ -490,6 +604,13 @@
       "click",
 
       closeTimeEditor
+    );
+
+    deleteButton.addEventListener(
+
+      "click",
+
+      deleteTimeItem
     );
 
     timeEditInput.addEventListener(
@@ -525,28 +646,52 @@
 
       event => {
 
-        // 3本指 = 開始
-        if (
-          event.touches.length === 3
-        ) {
+        clearTimeout(
+          touchTimer
+        );
 
-          event.preventDefault();
+        const touchCount =
+          event.touches.length;
 
-          startTimeRecord();
-        }
+        touchTimer =
+          setTimeout(() => {
 
-        // 4本指 = 終了
-        if (
-          event.touches.length === 4
-        ) {
+            // 3本指
+            if (
+              touchCount === 3
+            ) {
 
-          event.preventDefault();
+              event.preventDefault();
 
-          endTimeRecord();
-        }
+              startTimeRecord();
+            }
+
+            // 4本指
+            if (
+              touchCount === 4
+            ) {
+
+              event.preventDefault();
+
+              endTimeRecord();
+            }
+
+          }, TOUCH_DELAY);
       },
 
       { passive: false }
+    );
+
+    document.body.addEventListener(
+
+      "touchend",
+
+      () => {
+
+        clearTimeout(
+          touchTimer
+        );
+      }
     );
 
     // Service Worker 登録
