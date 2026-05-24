@@ -10,7 +10,8 @@
       width=device-width,
       initial-scale=1.0,
       maximum-scale=1.0,
-      user-scalable=no
+      user-scalable=no,
+      viewport-fit=cover
     "
   />
 
@@ -38,27 +39,34 @@
 
   <style>
 
+    html,
     body {
 
       margin: 0;
 
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
 
       background: #000;
       color: #fff;
+
+      overflow: hidden;
 
       font-family:
         "Noto Sans JP",
         sans-serif;
 
-      overflow: hidden;
-
-      user-select: none;
       -webkit-user-select: none;
+      user-select: none;
 
       touch-action: manipulation;
-      overscroll-behavior: none;
+    }
+
+    body {
+
+      position: fixed;
+
+      inset: 0;
 
       display: flex;
       flex-direction: column;
@@ -73,11 +81,11 @@
       display: flex;
       flex-direction: column;
 
+      box-sizing: border-box;
+
       overflow: visible;
 
       padding-bottom: 4px;
-
-      box-sizing: border-box;
     }
 
     #topArea {
@@ -101,8 +109,6 @@
       transform: translateY(-50%);
 
       font-size: 0.95rem;
-
-      white-space: nowrap;
     }
 
     #topText {
@@ -116,8 +122,6 @@
         translate(-50%, -50%);
 
       font-size: 1.45rem;
-
-      text-align: center;
 
       white-space: nowrap;
 
@@ -133,7 +137,7 @@
 
       transform: translateY(-50%);
 
-      width: 60px;
+      width: 70px;
 
       background: transparent;
 
@@ -176,13 +180,11 @@
 
       font-size: 1rem;
 
-      cursor: pointer;
-
       opacity: 0.9;
 
-      display: none;
+      cursor: pointer;
 
-      white-space: nowrap;
+      display: none;
     }
 
     #middleM {
@@ -202,8 +204,6 @@
 
       transition: opacity 0.2s;
 
-      line-height: 1;
-
       display: none;
     }
 
@@ -217,8 +217,6 @@
       padding-right: 20px;
 
       box-sizing: border-box;
-
-      padding-bottom: 2px;
     }
 
     .historyRow {
@@ -227,9 +225,9 @@
 
       display: flex;
 
-      align-items: center;
-
       justify-content: space-between;
+
+      align-items: center;
 
       margin-top: 2px;
     }
@@ -238,18 +236,16 @@
 
       font-size: 1.27rem;
 
+      line-height: 1.05;
+
       white-space: nowrap;
 
       cursor: pointer;
-
-      line-height: 1.05;
     }
 
     .peopleCount {
 
       width: 42px;
-
-      font-size: 0.9rem;
 
       background: transparent;
 
@@ -260,9 +256,11 @@
       border-bottom:
         1px solid #666;
 
+      outline: none;
+
       text-align: center;
 
-      outline: none;
+      font-size: 0.9rem;
 
       padding: 0;
     }
@@ -273,11 +271,10 @@
 
       flex-shrink: 0;
 
-      padding-top: 0px;
-
-      padding-bottom: 0px;
-
       margin-top: -2px;
+
+      padding-bottom:
+        env(safe-area-inset-bottom);
     }
 
     #memoArea {
@@ -296,11 +293,14 @@
 
       color: white;
 
-      border: 1px solid #333;
+      border:
+        1px solid #333;
 
       border-radius: 8px;
 
       resize: none;
+
+      outline: none;
 
       padding: 8px;
 
@@ -308,13 +308,13 @@
 
       font-size: 0.95rem;
 
-      outline: none;
+      line-height: 1.4;
 
       overflow: hidden;
 
       white-space: pre-wrap;
 
-      line-height: 1.4;
+      word-break: break-word;
     }
 
     #saveImageButton {
@@ -333,13 +333,12 @@
 
       color: white;
 
-      border: 1px solid #444;
+      border:
+        1px solid #444;
 
       border-radius: 8px;
 
       font-size: 1rem;
-
-      box-sizing: border-box;
     }
 
     #inputArea,
@@ -349,42 +348,43 @@
 
       position: fixed;
 
-      top: 60%;
       left: 50%;
+      top: 50%;
 
-      transform: translate(-50%, -50%);
+      transform:
+        translate(-50%, -50%);
+
+      width: 80%;
+      max-width: 400px;
 
       display: flex;
       flex-direction: column;
 
       gap: 8px;
 
-      width: 80%;
-      max-width: 400px;
-
       background: #111;
+
+      border:
+        1px solid #444;
 
       padding: 18px;
 
-      border: 1px solid #444;
-
       box-sizing: border-box;
 
-      z-index: 1000;
+      z-index: 9999;
     }
 
-    #confirmText {
-
-      text-align: center;
-
-      font-size: 1rem;
-    }
-
-    input {
+    input,
+    button {
 
       font-size: 1rem;
 
       padding: 8px;
+
+      box-sizing: border-box;
+    }
+
+    input {
 
       border: none;
 
@@ -393,15 +393,11 @@
 
     button {
 
-      font-size: 1rem;
-
-      padding: 8px;
-
-      border: none;
-
       background: #444;
 
-      color: #fff;
+      color: white;
+
+      border: none;
     }
 
     .buttonRow {
@@ -527,7 +523,7 @@
     style="display:none;"
   >
 
-    <div id="confirmText">
+    <div>
       本当に削除しますか？
     </div>
 
@@ -579,6 +575,16 @@
         "history"
       );
 
+    const memoArea =
+      document.getElementById(
+        "memoArea"
+      );
+
+    const saveImageButton =
+      document.getElementById(
+        "saveImageButton"
+      );
+
     const dateText =
       document.getElementById(
         "dateText"
@@ -612,16 +618,6 @@
     const teamSubmitButton =
       document.getElementById(
         "teamSubmitButton"
-      );
-
-    const saveImageButton =
-      document.getElementById(
-        "saveImageButton"
-      );
-
-    const memoArea =
-      document.getElementById(
-        "memoArea"
       );
 
     const timeEditArea =
@@ -659,64 +655,37 @@
         "cancelDeleteButton"
       );
 
-    let initialized = false;
+    let initialized =
+      false;
 
-    let startTime = null;
+    let startTime =
+      null;
 
-    let historyCount = 0;
+    let historyCount =
+      0;
 
-    let editingItem = null;
+    let editingItem =
+      null;
 
-    let touchTimer = null;
+    let touchTimer =
+      null;
 
-    const TOUCH_DELAY = 20;
+    const TOUCH_DELAY =
+      20;
 
     const numbers = [
 
       "①","②","③","④","⑤",
       "⑥","⑦","⑧","⑨","⑩",
-
       "⑪","⑫","⑬","⑭","⑮",
       "⑯","⑰","⑱","⑲","⑳",
-
       "㉑","㉒","㉓","㉔","㉕",
       "㉖","㉗","㉘","㉙","㉚",
-
       "㉛","㉜","㉝","㉞","㉟",
-
       "㊱","㊲","㊳","㊴","㊵",
-
       "㊶","㊷","㊸","㊹","㊺",
       "㊻","㊼","㊽","㊾","㊿"
     ];
-
-    function updateDate() {
-
-      const now = new Date();
-
-      const year =
-        now.getFullYear();
-
-      const month =
-        String(
-          now.getMonth() + 1
-        ).padStart(2, "0");
-
-      const day =
-        String(
-          now.getDate()
-        ).padStart(2, "0");
-
-      dateText.textContent =
-
-        year
-        + "/"
-        + month
-        + "/"
-        + day;
-    }
-
-    updateDate();
 
     function autoResizeMemo() {
 
@@ -732,9 +701,35 @@
       autoResizeMemo
     );
 
+    function updateDate() {
+
+      const now =
+        new Date();
+
+      const y =
+        now.getFullYear();
+
+      const m =
+        String(
+          now.getMonth() + 1
+        ).padStart(2, "0");
+
+      const d =
+        String(
+          now.getDate()
+        ).padStart(2, "0");
+
+      dateText.textContent =
+        `${y}/${m}/${d}`;
+    }
+
+    updateDate();
+
     function getNumberText(index) {
 
-      if (index < numbers.length) {
+      if (
+        index < numbers.length
+      ) {
 
         return numbers[index];
       }
@@ -744,7 +739,8 @@
 
     function getCurrentTime() {
 
-      const now = new Date();
+      const now =
+        new Date();
 
       return (
 
@@ -802,15 +798,6 @@
         rows.length;
     }
 
-    function enableMiddleM() {
-
-      middleM.style.display =
-        "block";
-
-      middleM.style.opacity =
-        "0.9";
-    }
-
     function createHistoryRow(text) {
 
       const row =
@@ -836,15 +823,14 @@
         "click",
         () => {
 
-          editingItem = item;
+          editingItem =
+            item;
 
           timeEditInput.value =
             item.textContent;
 
           timeEditArea.style.display =
             "flex";
-
-          timeEditInput.focus();
         }
       );
 
@@ -856,9 +842,11 @@
       people.className =
         "peopleCount";
 
-      people.type = "number";
+      people.type =
+        "number";
 
-      people.placeholder = "人数";
+      people.placeholder =
+        "人数";
 
       people.inputMode =
         "numeric";
@@ -872,13 +860,26 @@
       );
     }
 
+    function enableMiddleM() {
+
+      middleM.style.display =
+        "block";
+
+      middleM.style.opacity =
+        "0.9";
+    }
+
     function startTimeRecord() {
 
-      if (!initialized) {
+      if (
+        !initialized
+      ) {
         return;
       }
 
-      if (startTime !== null) {
+      if (
+        startTime !== null
+      ) {
         return;
       }
 
@@ -887,7 +888,7 @@
 
       historyCount++;
 
-      const text =
+      createHistoryRow(
 
         getNumberText(
           historyCount - 1
@@ -899,20 +900,23 @@
 
         +
 
-        "~";
-
-      createHistoryRow(text);
+        "~"
+      );
 
       enableMiddleM();
     }
 
     function endTimeRecord() {
 
-      if (!initialized) {
+      if (
+        !initialized
+      ) {
         return;
       }
 
-      if (startTime === null) {
+      if (
+        startTime === null
+      ) {
         return;
       }
 
@@ -935,18 +939,8 @@
           getCurrentTime();
       }
 
-      startTime = null;
-    }
-
-    function openEditor() {
-
-      inputArea.style.display =
-        "flex";
-
-      textInput.value =
-        topText.textContent;
-
-      textInput.focus();
+      startTime =
+        null;
     }
 
     function closeEditor() {
@@ -954,7 +948,9 @@
       const text =
         textInput.value.trim();
 
-      if (text === "") {
+      if (
+        text === ""
+      ) {
         return;
       }
 
@@ -970,17 +966,8 @@
       inputArea.style.display =
         "none";
 
-      initialized = true;
-    }
-
-    function openTeamEditor() {
-
-      teamInputArea.style.display =
-        "flex";
-
-      teamInput.value = "";
-
-      teamInput.focus();
+      initialized =
+        true;
     }
 
     function closeTeamEditor() {
@@ -988,7 +975,9 @@
       const text =
         teamInput.value.trim();
 
-      if (text !== "") {
+      if (
+        text !== ""
+      ) {
 
         teamName.textContent =
           "(" + text + ")";
@@ -1014,10 +1003,11 @@
 
         timeEditInput.value.substring(1);
 
+      editingItem =
+        null;
+
       timeEditArea.style.display =
         "none";
-
-      editingItem = null;
 
       updateAllNumbers();
     }
@@ -1049,21 +1039,13 @@
         row.remove();
       }
 
-      editingItem = null;
+      editingItem =
+        null;
 
       confirmArea.style.display =
         "none";
 
       updateAllNumbers();
-
-      if (
-        historyElement.children
-          .length === 0
-      ) {
-
-        middleM.style.opacity =
-          "0";
-      }
     }
 
     function cancelDelete() {
@@ -1071,7 +1053,8 @@
       confirmArea.style.display =
         "none";
 
-      editingItem = null;
+      editingItem =
+        null;
     }
 
     submitButton.addEventListener(
@@ -1084,9 +1067,28 @@
       closeTeamEditor
     );
 
+    topText.addEventListener(
+      "click",
+      () => {
+
+        inputArea.style.display =
+          "flex";
+
+        textInput.value =
+          topText.textContent;
+      }
+    );
+
     teamName.addEventListener(
       "click",
-      openTeamEditor
+      () => {
+
+        teamInputArea.style.display =
+          "flex";
+
+        teamInput.value =
+          "";
+      }
     );
 
     timeEditButton.addEventListener(
@@ -1109,13 +1111,77 @@
       cancelDelete
     );
 
-    topText.addEventListener(
-      "click",
+    document.body.addEventListener(
+
+      "touchstart",
+
       event => {
 
-        event.stopPropagation();
+        clearTimeout(
+          touchTimer
+        );
 
-        openEditor();
+        const count =
+          event.touches.length;
+
+        touchTimer =
+          setTimeout(() => {
+
+            if (
+              count === 3
+            ) {
+
+              event.preventDefault();
+
+              startTimeRecord();
+            }
+
+            if (
+              count === 4
+            ) {
+
+              event.preventDefault();
+
+              endTimeRecord();
+            }
+
+          }, TOUCH_DELAY);
+      },
+
+      { passive: false }
+    );
+
+    document.body.addEventListener(
+      "touchend",
+      () => {
+
+        clearTimeout(
+          touchTimer
+        );
+      }
+    );
+
+    document.addEventListener(
+
+      "keydown",
+
+      event => {
+
+        if (
+          event.key ===
+          "AudioVolumeUp"
+        ) {
+
+          startTimeRecord();
+        }
+
+        if (
+          event.key ===
+          "AudioVolumeDown"
+        ) {
+
+          endTimeRecord();
+        }
       }
     );
 
@@ -1125,17 +1191,33 @@
 
       async () => {
 
-        saveImageButton.style.display =
-          "none";
+        saveImageButton.style.visibility =
+          "hidden";
 
         historyElement.style.overflow =
           "visible";
+
+        const oldHeight =
+          captureArea.style.height;
+
+        captureArea.style.height =
+          "auto";
+
+        await new Promise(
+          resolve =>
+            requestAnimationFrame(
+              resolve
+            )
+        );
 
         const canvas =
           await html2canvas(
             captureArea,
             {
-              backgroundColor: "#000",
+              backgroundColor:
+                "#000",
+
+              useCORS: true,
 
               width:
                 captureArea.scrollWidth,
@@ -1154,8 +1236,11 @@
             }
           );
 
-        saveImageButton.style.display =
-          "block";
+        captureArea.style.height =
+          oldHeight;
+
+        saveImageButton.style.visibility =
+          "visible";
 
         canvas.toBlob(
 
@@ -1166,7 +1251,8 @@
                 [blob],
                 "record.png",
                 {
-                  type: "image/png"
+                  type:
+                    "image/png"
                 }
               );
 
@@ -1181,7 +1267,8 @@
 
                 files: [file],
 
-                title: "record"
+                title:
+                  "record"
               });
 
               return;
@@ -1193,7 +1280,9 @@
               );
 
             link.href =
-              URL.createObjectURL(blob);
+              URL.createObjectURL(
+                blob
+              );
 
             link.download =
               "record.png";
@@ -1204,59 +1293,10 @@
       }
     );
 
-    document.body.addEventListener(
-
-      "touchstart",
-
-      event => {
-
-        clearTimeout(
-          touchTimer
-        );
-
-        const touchCount =
-          event.touches.length;
-
-        touchTimer =
-          setTimeout(() => {
-
-            if (
-              touchCount === 3
-            ) {
-
-              event.preventDefault();
-
-              startTimeRecord();
-            }
-
-            if (
-              touchCount === 4
-            ) {
-
-              event.preventDefault();
-
-              endTimeRecord();
-            }
-
-          }, TOUCH_DELAY);
-      },
-
-      { passive: false }
-    );
-
-    document.body.addEventListener(
-
-      "touchend",
-
-      () => {
-
-        clearTimeout(
-          touchTimer
-        );
-      }
-    );
-
-    if ("serviceWorker" in navigator) {
+    if (
+      "serviceWorker"
+      in navigator
+    ) {
 
       navigator
         .serviceWorker
