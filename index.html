@@ -76,7 +76,7 @@
 
       width: 100%;
 
-      height: 100%;
+      min-height: 100%;
 
       display: flex;
       flex-direction: column;
@@ -1210,31 +1210,38 @@
             )
         );
 
-        const canvas =
-          await html2canvas(
-            captureArea,
-            {
-              backgroundColor:
-                "#000",
+        const canvas = await html2canvas(
+  captureArea,
+  {
+    backgroundColor: "#000",
+    useCORS: true,
+    width: captureArea.scrollWidth,
+    height: captureArea.scrollHeight,
+    windowWidth: captureArea.scrollWidth,
+    windowHeight: captureArea.scrollHeight,
+    scrollX: 0,
+    scrollY: 0
+  }
+);
 
-              useCORS: true,
+// ★ここから上をカットする処理
+const cutTop = 20; // ←カットしたいpx（調整）
 
-              width:
-                captureArea.scrollWidth,
+const trimmedCanvas = document.createElement("canvas");
+const ctx = trimmedCanvas.getContext("2d");
 
-              height:
-                captureArea.scrollHeight,
+trimmedCanvas.width = canvas.width;
+trimmedCanvas.height = canvas.height - cutTop;
 
-              windowWidth:
-                captureArea.scrollWidth,
-
-              windowHeight:
-                captureArea.scrollHeight,
-
-              scrollX: 0,
-              scrollY: 0
-            }
-          );
+ctx.drawImage(
+  canvas,
+  0, cutTop, // 元画像の開始位置（上を削る）
+  canvas.width,
+  canvas.height - cutTop,
+  0, 0,
+  canvas.width,
+  canvas.height - cutTop
+);
 
         captureArea.style.height =
           oldHeight;
