@@ -15,6 +15,7 @@
   <style>
     body {
       margin: 0;
+
       width: 100vw;
       height: 100vh;
 
@@ -23,7 +24,7 @@
 
       font-family: sans-serif;
 
-      overflow: hidden;
+      overflow-x: hidden;
 
       user-select: none;
       -webkit-user-select: none;
@@ -48,16 +49,24 @@
       cursor: pointer;
     }
 
-    #time {
-      flex: 1;
-
+    #history {
       width: 100%;
 
+      flex: 1;
+
+      overflow-y: auto;
+
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
 
-      font-size: 3rem;
+      padding-bottom: 30px;
+    }
+
+    .historyItem {
+      font-size: 2rem;
+
+      margin-top: 10px;
     }
 
     #inputArea {
@@ -97,9 +106,7 @@
 
 <div id="topText"></div>
 
-<div id="time">
-  タッチしてください
-</div>
+<div id="history"></div>
 
 <div id="inputArea">
   <input id="textInput" type="text" placeholder="文字を入力" />
@@ -108,7 +115,8 @@
 
 <script>
   const topText = document.getElementById("topText");
-  const timeElement = document.getElementById("time");
+
+  const historyElement = document.getElementById("history");
 
   const inputArea = document.getElementById("inputArea");
   const textInput = document.getElementById("textInput");
@@ -116,7 +124,7 @@
 
   let initialized = false;
 
-  function updateTime() {
+  function addTimeHistory() {
 
     if (!initialized) {
       return;
@@ -129,10 +137,17 @@
       now.getMinutes().toString().padStart(2, "0") + ":" +
       now.getSeconds().toString().padStart(2, "0");
 
-    timeElement.textContent = timeString;
+    const item = document.createElement("div");
+
+    item.className = "historyItem";
+
+    item.textContent = timeString;
+
+    historyElement.prepend(item);
   }
 
   function openEditor() {
+
     inputArea.style.display = "flex";
 
     textInput.value = topText.textContent;
@@ -164,9 +179,12 @@
     openEditor();
   });
 
-  document.body.addEventListener("touchstart", updateTime);
+  document.body.addEventListener("touchstart", event => {
 
-  document.body.addEventListener("click", updateTime);
+    if (event.touches.length === 3) {
+      addTimeHistory();
+    }
+  });
 
   // Service Worker 登録
   if ("serviceWorker" in navigator) {
