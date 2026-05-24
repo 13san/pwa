@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+
   <meta charset="UTF-8" />
 
   <meta
@@ -66,11 +67,28 @@
       font-size: 2rem;
 
       padding-top: 30px;
-      padding-bottom: 20px;
 
       word-break: break-word;
 
       cursor: pointer;
+    }
+
+    #middleM {
+
+      width: 100%;
+
+      text-align: center;
+
+      font-size: 1.6rem;
+
+      font-style: italic;
+
+      margin-top: -5px;
+      margin-bottom: 15px;
+
+      opacity: 0.9;
+
+      pointer-events: none;
     }
 
     #history {
@@ -100,9 +118,12 @@
       margin-top: 10px;
 
       white-space: nowrap;
+
+      cursor: pointer;
     }
 
-    #inputArea {
+    #inputArea,
+    #timeEditArea {
 
       position: absolute;
 
@@ -118,6 +139,14 @@
 
       width: 80%;
       max-width: 400px;
+
+      background: #111;
+
+      padding: 20px;
+
+      border: 1px solid #444;
+
+      box-sizing: border-box;
     }
 
     input {
@@ -145,11 +174,14 @@
     }
 
   </style>
+
 </head>
 
 <body>
 
   <div id="topText"></div>
+
+  <div id="middleM">M</div>
 
   <div id="history"></div>
 
@@ -163,6 +195,23 @@
 
     <button id="submitButton">
       決定
+    </button>
+
+  </div>
+
+  <div
+    id="timeEditArea"
+    style="display:none;"
+  >
+
+    <input
+      id="timeEditInput"
+      type="text"
+      placeholder="①12:34:56~12:40:00"
+    />
+
+    <button id="timeEditButton">
+      修正
     </button>
 
   </div>
@@ -194,11 +243,28 @@
         "submitButton"
       );
 
+    const timeEditArea =
+      document.getElementById(
+        "timeEditArea"
+      );
+
+    const timeEditInput =
+      document.getElementById(
+        "timeEditInput"
+      );
+
+    const timeEditButton =
+      document.getElementById(
+        "timeEditButton"
+      );
+
     let initialized = false;
 
     let startTime = null;
 
     let historyCount = 0;
+
+    let editingItem = null;
 
     const numbers = [
 
@@ -250,74 +316,88 @@
       );
     }
 
-    function vibrate() {
-
-      if (navigator.vibrate) {
-
-        navigator.vibrate(50);
-      }
-    }
-
-    function addTimeHistory() {
+    function startTimeRecord() {
 
       if (!initialized) {
         return;
       }
 
-      vibrate();
-
-      // 開始時間
-      if (startTime === null) {
-
-        startTime =
-          getCurrentTime();
-
-        historyCount++;
-
-        const item =
-          document.createElement(
-            "div"
-          );
-
-        item.className =
-          "historyItem";
-
-        let numberText = "";
-
-        if (
-          historyCount <=
-          numbers.length
-        ) {
-
-          numberText =
-            numbers[
-              historyCount - 1
-            ];
-
-        } else {
-
-          numberText =
-            historyCount + ".";
-        }
-
-        item.textContent =
-
-          numberText +
-          startTime +
-          "~";
-
-        item.id =
-          "history-" +
-          historyCount;
-
-        historyElement.appendChild(
-          item
-        );
-
+      if (startTime !== null) {
         return;
       }
 
-      // 終了時間
+      startTime =
+        getCurrentTime();
+
+      historyCount++;
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "historyItem";
+
+      let numberText = "";
+
+      if (
+        historyCount <=
+        numbers.length
+      ) {
+
+        numberText =
+          numbers[
+            historyCount - 1
+          ];
+
+      } else {
+
+        numberText =
+          historyCount + ".";
+      }
+
+      item.textContent =
+
+        numberText +
+        startTime +
+        "~";
+
+      item.id =
+        "history-" +
+        historyCount;
+
+      item.addEventListener(
+        "click",
+        () => {
+
+          editingItem = item;
+
+          timeEditInput.value =
+            item.textContent;
+
+          timeEditArea.style.display =
+            "flex";
+
+          timeEditInput.focus();
+        }
+      );
+
+      historyElement.appendChild(
+        item
+      );
+    }
+
+    function endTimeRecord() {
+
+      if (!initialized) {
+        return;
+      }
+
+      if (startTime === null) {
+        return;
+      }
+
       const endTime =
         getCurrentTime();
 
@@ -330,7 +410,6 @@
       if (item) {
 
         item.textContent =
-
           item.textContent +
           endTime;
       }
@@ -367,6 +446,23 @@
       initialized = true;
     }
 
+    function closeTimeEditor() {
+
+      if (
+        editingItem === null
+      ) {
+        return;
+      }
+
+      editingItem.textContent =
+        timeEditInput.value;
+
+      timeEditArea.style.display =
+        "none";
+
+      editingItem = null;
+    }
+
     submitButton.addEventListener(
 
       "click",
@@ -389,6 +485,28 @@
       }
     );
 
+    timeEditButton.addEventListener(
+
+      "click",
+
+      closeTimeEditor
+    );
+
+    timeEditInput.addEventListener(
+
+      "keydown",
+
+      event => {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          closeTimeEditor();
+        }
+      }
+    );
+
     topText.addEventListener(
 
       "click",
@@ -407,13 +525,24 @@
 
       event => {
 
+        // 3本指 = 開始
         if (
           event.touches.length === 3
         ) {
 
           event.preventDefault();
 
-          addTimeHistory();
+          startTimeRecord();
+        }
+
+        // 4本指 = 終了
+        if (
+          event.touches.length === 4
+        ) {
+
+          event.preventDefault();
+
+          endTimeRecord();
         }
       },
 
