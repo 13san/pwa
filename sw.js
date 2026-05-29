@@ -159,56 +159,6 @@
       display: none;
     }
 
-    #subArea {
-
-      position: relative;
-
-      width: 100%;
-
-      height: 22px;
-
-      margin-top: -1px;
-    }
-
-    #teamName {
-
-      position: absolute;
-
-      left: 50%;
-      top: 50%;
-
-      transform:
-        translate(-50%, -50%);
-
-      font-size: 1rem;
-
-      opacity: 0.9;
-
-      cursor: pointer;
-
-      display: none;
-    }
-
-    #middleM {
-
-      position: absolute;
-
-      right: 25px;
-      top: 50%;
-
-      transform: translateY(-50%);
-
-      font-size: 1rem;
-
-      font-style: italic;
-
-      opacity: 0;
-
-      transition: opacity 0.2s;
-
-      display: none;
-    }
-
     #history {
 
       flex: 1;
@@ -241,30 +191,6 @@
       line-height: 1.05;
 
       white-space: nowrap;
-
-      cursor: pointer;
-    }
-
-    .peopleCount {
-
-      width: 42px;
-
-      background: transparent;
-
-      color: white;
-
-      border: none;
-
-      border-bottom:
-        1px solid #666;
-
-      outline: none;
-
-      text-align: center;
-
-      font-size: 0.9rem;
-
-      padding: 0;
     }
 
     #bottomArea {
@@ -343,10 +269,7 @@
       font-size: 1rem;
     }
 
-    #inputArea,
-    #teamInputArea,
-    #timeEditArea,
-    #confirmArea {
+    #inputArea {
 
       position: fixed;
 
@@ -402,18 +325,6 @@
       border: none;
     }
 
-    .buttonRow {
-
-      display: flex;
-
-      gap: 8px;
-    }
-
-    .buttonRow button {
-
-      flex: 1;
-    }
-
   </style>
 
 </head>
@@ -433,18 +344,6 @@
         type="text"
         placeholder="天気"
       />
-
-    </div>
-
-    <div id="subArea">
-
-      <div id="teamName">
-        (コンビ名)
-      </div>
-
-      <div id="middleM">
-        M
-      </div>
 
     </div>
 
@@ -496,11 +395,6 @@
     const weatherInput =
       document.getElementById(
         "weatherInput"
-      );
-
-    const historyElement =
-      document.getElementById(
-        "history"
       );
 
     const memoArea =
@@ -658,13 +552,20 @@
           "1.4";
 
         memoClone.style.whiteSpace =
-          "pre-wrap";
+          "normal";
 
         memoClone.style.wordBreak =
           "break-word";
 
-        memoClone.textContent =
-          memoArea.value;
+        memoClone.innerHTML =
+
+          memoArea.value
+
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+
+            .replace(/\n/g, "<br>");
 
         memoArea.style.display =
           "none";
@@ -676,9 +577,6 @@
 
         saveImageButton.style.visibility =
           "hidden";
-
-        historyElement.style.overflow =
-          "visible";
 
         const oldHeight =
           captureArea.style.height;
