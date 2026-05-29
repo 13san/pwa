@@ -50,7 +50,7 @@ body {
   background: #000;
   color: #fff;
 
-  overflow: hidden;
+  overflow: auto;
 
   font-family:
     "Noto Sans JP",
@@ -72,30 +72,23 @@ body {
   flex-direction: column;
 }
 
-#appContainer {
-
-  width: 100%;
-  height: 100%;
-
-  overflow-y: auto;
-
-  -webkit-overflow-scrolling: touch;
-}
-
 #captureArea {
 
   width: 100%;
 
-  min-height: 100%;
+  height: 100vh;
 
   display: flex;
   flex-direction: column;
 
   box-sizing: border-box;
 
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
 
-  padding-bottom: 40px;
+  -webkit-overflow-scrolling: touch;
+
+  padding-bottom: 220px;
 }
 
 #topArea {
@@ -107,8 +100,6 @@ body {
   height: 36px;
 
   margin-top: 40px;
-
-  flex-shrink: 0;
 }
 
 #dateText {
@@ -180,8 +171,6 @@ body {
   height: 22px;
 
   margin-top: -1px;
-
-  flex-shrink: 0;
 }
 
 #teamName {
@@ -225,12 +214,16 @@ body {
 
 #history {
 
+  flex: 1;
+
+  overflow: visible;
+
   padding-left: 20px;
   padding-right: 20px;
 
-  box-sizing: border-box;
+  padding-bottom: 220px;
 
-  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .historyRow {
@@ -281,24 +274,32 @@ body {
 
 #bottomArea {
 
+  position: fixed;
+
+  left: 0;
+  bottom: 0;
+
   width: 100%;
 
-  margin-top: 10px;
+  background: #000;
 
-  flex-shrink: 0;
+  z-index: 1000;
 
   padding-bottom:
-    calc(env(safe-area-inset-bottom) + 30px);
+    env(safe-area-inset-bottom);
+
+  border-top:
+    1px solid #222;
 }
 
-#memoView {
+#memoDisplay {
 
   width: calc(100% - 40px);
 
   min-height: 90px;
 
   margin:
-    0
+    8px
     20px
     4px
     20px;
@@ -323,19 +324,17 @@ body {
   white-space: pre-wrap;
 
   word-break: break-word;
+
+  overflow-wrap: break-word;
 }
 
 #memoArea {
 
   position: absolute;
 
-  left: -9999px;
-
-  top: -9999px;
+  left: -99999px;
 
   opacity: 0;
-
-  pointer-events: none;
 }
 
 #saveImageButton {
@@ -345,7 +344,7 @@ body {
   margin:
     0
     20px
-    2px
+    6px
     20px;
 
   padding: 8px;
@@ -435,67 +434,59 @@ button {
   flex: 1;
 }
 
-.hidden {
-
-  display: none !important;
-}
-
 </style>
 
 </head>
 
 <body>
 
-<div id="appContainer">
+<div id="captureArea">
 
-  <div id="captureArea">
+  <div id="topArea">
 
-    <div id="topArea">
+    <div id="dateText"></div>
 
-      <div id="dateText"></div>
+    <div id="topText"></div>
 
-      <div id="topText"></div>
+    <input
+      id="weatherInput"
+      type="text"
+      placeholder="天気"
+    />
 
-      <input
-        id="weatherInput"
-        type="text"
-        placeholder="天気"
-      />
+  </div>
 
+  <div id="subArea">
+
+    <div id="teamName">
+      (猿一番)
     </div>
 
-    <div id="subArea">
-
-      <div id="teamName">
-        (コンビ名)
-      </div>
-
-      <div id="middleM">
-        M
-      </div>
-
-    </div>
-
-    <div id="history"></div>
-
-    <div id="bottomArea">
-
-      <div
-        id="memoView"
-        contenteditable="true"
-      ></div>
-
-      <textarea
-        id="memoArea"
-      ></textarea>
-
-      <button id="saveImageButton">
-        写真
-      </button>
-
+    <div id="middleM">
+      M
     </div>
 
   </div>
+
+  <div id="history"></div>
+
+</div>
+
+<div id="bottomArea">
+
+  <div
+    id="memoDisplay"
+    contenteditable="true"
+    spellcheck="false"
+  ></div>
+
+  <textarea
+    id="memoArea"
+  ></textarea>
+
+  <button id="saveImageButton">
+    写真
+  </button>
 
 </div>
 
@@ -504,7 +495,7 @@ button {
   <input
     id="textInput"
     type="text"
-    placeholder="現場名を入力！"
+    placeholder="現場名を入力"
   />
 
   <button id="submitButton">
@@ -616,9 +607,9 @@ const memoArea =
     "memoArea"
   );
 
-const memoView =
+const memoDisplay =
   document.getElementById(
-    "memoView"
+    "memoDisplay"
   );
 
 const saveImageButton =
@@ -711,33 +702,34 @@ let editingItem =
 let touchTimer =
   null;
 
-let currentScene =
-  1;
-
 const TOUCH_DELAY =
   20;
+
+const weekNames = [
+  "日",
+  "月",
+  "火",
+  "水",
+  "木",
+  "金",
+  "土"
+];
 
 const numbers = [
 
   "①","②","③","④","⑤",
   "⑥","⑦","⑧","⑨","⑩",
   "⑪","⑫","⑬","⑭","⑮",
-  "⑯","⑰","⑱","⑲","⑳",
-  "㉑","㉒","㉓","㉔","㉕",
-  "㉖","㉗","㉘","㉙","㉚",
-  "㉛","㉜","㉝","㉞","㉟",
-  "㊱","㊲","㊳","㊴","㊵",
-  "㊶","㊷","㊸","㊹","㊺",
-  "㊻","㊼","㊽","㊾","㊿"
+  "⑯","⑰","⑱","⑲","⑳"
 ];
 
 function syncMemo() {
 
   memoArea.value =
-    memoView.innerText;
+    memoDisplay.innerText;
 }
 
-memoView.addEventListener(
+memoDisplay.addEventListener(
   "input",
   syncMemo
 );
@@ -746,16 +738,6 @@ function updateDate() {
 
   const now =
     new Date();
-
-  const week = [
-    "日",
-    "月",
-    "火",
-    "水",
-    "木",
-    "金",
-    "土"
-  ];
 
   const y =
     now.getFullYear();
@@ -771,7 +753,9 @@ function updateDate() {
     ).padStart(2, "0");
 
   const w =
-    week[now.getDay()];
+    weekNames[
+      now.getDay()
+    ];
 
   dateText.textContent =
     `${y}/${m}/${d}(${w})`;
@@ -791,29 +775,37 @@ function getNumberText(index) {
   return (index + 1) + ".";
 }
 
-function getRoundedTime(date) {
+function getRoundedTime() {
+
+  const now =
+    new Date();
 
   let h =
-    date.getHours();
+    now.getHours();
 
   let m =
-    date.getMinutes();
+    now.getMinutes();
 
   const s =
-    date.getSeconds();
+    now.getSeconds();
 
-  if (s >= 30) {
+  if (
+    s >= 30
+  ) {
 
     m++;
 
-    if (m >= 60) {
+    if (
+      m >= 60
+    ) {
 
       m = 0;
 
       h++;
 
-      if (h >= 24) {
-
+      if (
+        h >= 24
+      ) {
         h = 0;
       }
     }
@@ -848,19 +840,13 @@ function updateAllNumbers() {
           ".historyItem"
         );
 
-      const text =
-        item.textContent;
-
-      const removed =
-        text.substring(1);
-
       item.textContent =
 
         getNumberText(index)
 
         +
 
-        removed;
+        item.textContent.substring(1);
     }
   );
 
@@ -918,9 +904,6 @@ function createHistoryRow(text) {
   people.placeholder =
     "人数";
 
-  people.inputMode =
-    "numeric";
-
   row.appendChild(item);
 
   row.appendChild(people);
@@ -954,7 +937,7 @@ function startTimeRecord() {
   }
 
   startTime =
-    new Date();
+    getRoundedTime();
 
   historyCount++;
 
@@ -966,9 +949,7 @@ function startTimeRecord() {
 
     +
 
-    getRoundedTime(
-      startTime
-    )
+    startTime
 
     +
 
@@ -1008,35 +989,11 @@ function endTimeRecord() {
   ) {
 
     item.textContent +=
-
-      getRoundedTime(
-        new Date()
-      );
+      getRoundedTime();
   }
 
   startTime =
     null;
-}
-
-function toggleScene() {
-
-  if (
-    currentScene === 1
-  ) {
-
-    currentScene = 2;
-
-    captureArea.style.filter =
-      "invert(1)";
-  }
-
-  else {
-
-    currentScene = 1;
-
-    captureArea.style.filter =
-      "none";
-  }
 }
 
 function closeEditor() {
@@ -1095,12 +1052,7 @@ function closeTimeEditor() {
   }
 
   editingItem.textContent =
-
-    editingItem.textContent.charAt(0)
-
-    +
-
-    timeEditInput.value.substring(1);
+    timeEditInput.value;
 
   editingItem =
     null;
@@ -1184,9 +1136,6 @@ teamName.addEventListener(
 
     teamInputArea.style.display =
       "flex";
-
-    teamInput.value =
-      "";
   }
 );
 
@@ -1242,15 +1191,6 @@ document.body.addEventListener(
           event.preventDefault();
 
           endTimeRecord();
-        }
-
-        if (
-          count === 5
-        ) {
-
-          event.preventDefault();
-
-          toggleScene();
         }
 
       }, TOUCH_DELAY);
@@ -1311,29 +1251,15 @@ saveImageButton.addEventListener(
 
     const canvas =
       await html2canvas(
-        captureArea,
+        document.body,
         {
           backgroundColor:
             "#000",
 
           useCORS: true,
 
-          width:
-            captureArea.scrollWidth,
-
-          height:
-            captureArea.scrollHeight,
-
-          windowWidth:
-            captureArea.scrollWidth,
-
-          windowHeight:
-            captureArea.scrollHeight,
-
           scrollX: 0,
-          scrollY: 0,
-
-          y: 20
+          scrollY: 0
         }
       );
 
@@ -1389,6 +1315,49 @@ saveImageButton.addEventListener(
       }
     );
   }
+);
+
+document.addEventListener(
+  "gesturestart",
+  event => {
+    event.preventDefault();
+  },
+  { passive: false }
+);
+
+document.addEventListener(
+  "gesturechange",
+  event => {
+    event.preventDefault();
+  },
+  { passive: false }
+);
+
+document.addEventListener(
+  "gestureend",
+  event => {
+    event.preventDefault();
+  },
+  { passive: false }
+);
+
+let lastTouchEnd = 0;
+
+document.addEventListener(
+  "touchend",
+  event => {
+
+    const now = Date.now();
+
+    if (
+      now - lastTouchEnd <= 300
+    ) {
+      event.preventDefault();
+    }
+
+    lastTouchEnd = now;
+  },
+  { passive: false }
 );
 
 if (
