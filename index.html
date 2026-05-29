@@ -1,8 +1,9 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 
-  
+  <meta charset="UTF-8" />
 
   <meta
     name="viewport"
@@ -70,6 +71,28 @@
 
       display: flex;
       flex-direction: column;
+    }
+
+    #scene1 {
+
+      width: 100%;
+      height: 100%;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    #scene2 {
+
+      width: 100%;
+      height: 100%;
+
+      display: none;
+
+      justify-content: center;
+      align-items: center;
+
+      font-size: 2rem;
     }
 
     #captureArea {
@@ -418,49 +441,57 @@
 
 <body>
 
-  <div id="captureArea">
+  <div id="scene1">
 
-    <div id="topArea">
+    <div id="captureArea">
 
-      <div id="dateText"></div>
+      <div id="topArea">
 
-      <div id="topText"></div>
+        <div id="dateText"></div>
 
-      <input
-        id="weatherInput"
-        type="text"
-        placeholder="天気"
-      />
+        <div id="topText"></div>
 
-    </div>
+        <input
+          id="weatherInput"
+          type="text"
+          placeholder="天気"
+        />
 
-    <div id="subArea">
-
-      <div id="teamName">
-        (コンビ名)
       </div>
 
-      <div id="middleM">
-        M
+      <div id="subArea">
+
+        <div id="teamName">
+          (コンビ名)
+        </div>
+
+        <div id="middleM">
+          M
+        </div>
+
+      </div>
+
+      <div id="history"></div>
+
+      <div id="bottomArea">
+
+        <textarea
+          id="memoArea"
+          placeholder="メモ"
+        ></textarea>
+
+        <button id="saveImageButton">
+          写真
+        </button>
+
       </div>
 
     </div>
 
-    <div id="history"></div>
+  </div>
 
-    <div id="bottomArea">
-
-      <textarea
-        id="memoArea"
-        placeholder="メモ"
-      ></textarea>
-
-      <button id="saveImageButton">
-        写真
-      </button>
-
-    </div>
-
+  <div id="scene2">
+    シーン2
   </div>
 
   <div id="inputArea">
@@ -544,6 +575,18 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
+
+    const scene1 =
+      document.getElementById(
+        "scene1"
+      );
+
+    const scene2 =
+      document.getElementById(
+        "scene2"
+      );
+
+    let currentScene = 1;
 
     const captureArea =
       document.getElementById(
@@ -671,21 +714,41 @@
       null;
 
     const TOUCH_DELAY =
-      20;
+      80;
 
     const numbers = [
 
       "①","②","③","④","⑤",
       "⑥","⑦","⑧","⑨","⑩",
       "⑪","⑫","⑬","⑭","⑮",
-      "⑯","⑰","⑱","⑲","⑳",
-      "㉑","㉒","㉓","㉔","㉕",
-      "㉖","㉗","㉘","㉙","㉚",
-      "㉛","㉜","㉝","㉞","㉟",
-      "㊱","㊲","㊳","㊴","㊵",
-      "㊶","㊷","㊸","㊹","㊺",
-      "㊻","㊼","㊽","㊾","㊿"
+      "⑯","⑰","⑱","⑲","⑳"
     ];
+
+    function toggleScene() {
+
+      if (
+        currentScene === 1
+      ) {
+
+        scene1.style.display =
+          "none";
+
+        scene2.style.display =
+          "flex";
+
+        currentScene = 2;
+
+        return;
+      }
+
+      scene2.style.display =
+        "none";
+
+      scene1.style.display =
+        "flex";
+
+      currentScene = 1;
+    }
 
     function autoResizeMemo() {
 
@@ -719,8 +782,21 @@
           now.getDate()
         ).padStart(2, "0");
 
+      const weeks = [
+        "日",
+        "月",
+        "火",
+        "水",
+        "木",
+        "金",
+        "土"
+      ];
+
+      const w =
+        weeks[now.getDay()];
+
       dateText.textContent =
-        `${y}/${m}/${d}`;
+        `${y}/${m}/${d}(${w})`;
     }
 
     updateDate();
@@ -737,34 +813,52 @@
       return (index + 1) + ".";
     }
 
-    function getCurrentTime() {
+    function getRoundedTime() {
 
       const now =
         new Date();
 
+      let hour =
+        now.getHours();
+
+      let minute =
+        now.getMinutes();
+
+      const second =
+        now.getSeconds();
+
+      if (
+        second >= 30
+      ) {
+
+        minute++;
+
+        if (
+          minute >= 60
+        ) {
+
+          minute = 0;
+          hour++;
+
+          if (
+            hour >= 24
+          ) {
+
+            hour = 0;
+          }
+        }
+      }
+
       return (
 
-        now
-          .getHours()
-          .toString()
+        String(hour)
           .padStart(2, "0")
 
         + ":"
 
         +
 
-        now
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")
-
-        + ":"
-
-        +
-
-        now
-          .getSeconds()
-          .toString()
+        String(minute)
           .padStart(2, "0")
       );
     }
@@ -884,7 +978,7 @@
       }
 
       startTime =
-        getCurrentTime();
+        getRoundedTime();
 
       historyCount++;
 
@@ -936,7 +1030,7 @@
       ) {
 
         item.textContent +=
-          getCurrentTime();
+          getRoundedTime();
       }
 
       startTime =
@@ -1145,6 +1239,15 @@
               endTimeRecord();
             }
 
+            if (
+              count === 5
+            ) {
+
+              event.preventDefault();
+
+              toggleScene();
+            }
+
           }, TOUCH_DELAY);
       },
 
@@ -1307,3 +1410,4 @@
 
 </body>
 </html>
+```
