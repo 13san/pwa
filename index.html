@@ -50,7 +50,7 @@ body {
   background: #000;
   color: #fff;
 
-  overflow: auto;
+  overflow: hidden;
 
   font-family:
     "Noto Sans JP",
@@ -88,7 +88,7 @@ body {
 
   -webkit-overflow-scrolling: touch;
 
-  padding-bottom: 220px;
+  padding-bottom: 160px;
 }
 
 #topArea {
@@ -97,13 +97,11 @@ body {
 
   width: 100%;
 
-  min-height: 60px;
+  min-height: 72px;
 
-  margin-top: 40px;
+  padding-top: 40px;
 
-  padding-top: 4px;
-
-  padding-bottom: 4px;
+  box-sizing: border-box;
 }
 
 #dateText {
@@ -111,9 +109,7 @@ body {
   position: absolute;
 
   left: 16px;
-  top: 50%;
-
-  transform: translateY(-50%);
+  top: 48px;
 
   font-size: 0.95rem;
 
@@ -122,25 +118,25 @@ body {
 
 #topText {
 
-  position: absolute;
-
-  left: 50%;
-  top: 50%;
-
-  transform:
-    translate(-50%, -50%);
-
-  font-size: 1.45rem;
-
-  max-width: 60%;
+  width: 100%;
 
   text-align: center;
 
+  font-size: 1.45rem;
+
+  padding:
+    0
+    90px
+    0
+    90px;
+
+  box-sizing: border-box;
+
+  word-break: break-word;
+
   white-space: normal;
 
-  overflow-wrap: break-word;
-
-  line-height: 1.2;
+  line-height: 1.3;
 
   cursor: pointer;
 }
@@ -150,9 +146,7 @@ body {
   position: absolute;
 
   right: 16px;
-  top: 50%;
-
-  transform: translateY(-50%);
+  top: 48px;
 
   width: 70px;
 
@@ -180,20 +174,16 @@ body {
 
   width: 100%;
 
-  min-height: 28px;
+  min-height: 32px;
 
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 #teamName {
 
-  position: absolute;
+  width: 100%;
 
-  left: 50%;
-  top: 50%;
-
-  transform:
-    translate(-50%, -50%);
+  text-align: center;
 
   font-size: 1rem;
 
@@ -202,6 +192,14 @@ body {
   cursor: pointer;
 
   display: none;
+
+  word-break: break-word;
+
+  padding:
+    0
+    20px;
+
+  box-sizing: border-box;
 }
 
 #middleM {
@@ -209,9 +207,7 @@ body {
   position: absolute;
 
   right: 25px;
-  top: 50%;
-
-  transform: translateY(-50%);
+  top: 0;
 
   font-size: 1rem;
 
@@ -233,8 +229,6 @@ body {
   padding-left: 20px;
   padding-right: 20px;
 
-  padding-bottom: 220px;
-
   box-sizing: border-box;
 }
 
@@ -248,24 +242,24 @@ body {
 
   align-items: center;
 
-  margin-top: 2px;
+  margin-top: 4px;
 
-  gap: 12px;
+  gap: 10px;
 }
 
 .historyItem {
+
+  flex: 1;
 
   font-size: 1.27rem;
 
   line-height: 1.2;
 
-  cursor: pointer;
-
-  overflow-wrap: break-word;
-
   word-break: break-word;
 
-  flex: 1;
+  white-space: normal;
+
+  cursor: pointer;
 }
 
 .peopleCount {
@@ -321,7 +315,7 @@ body {
   margin:
     8px
     20px
-    4px
+    0
     20px;
 
   background: #111;
@@ -362,7 +356,7 @@ body {
   width: calc(100% - 40px);
 
   margin:
-    0
+    4px
     20px
     6px
     20px;
@@ -632,11 +626,6 @@ const memoDisplay =
     "memoDisplay"
   );
 
-const bottomArea =
-  document.getElementById(
-    "bottomArea"
-  );
-
 const saveImageButton =
   document.getElementById(
     "saveImageButton"
@@ -861,22 +850,13 @@ function updateAllNumbers() {
           ".historyItem"
         );
 
-      const text =
-        item.textContent;
-
-      const removed =
-        text.replace(
-          /^[^\d]*?/,
-          ""
-        );
-
       item.textContent =
 
         getNumberText(index)
 
         +
 
-        removed;
+        item.textContent.substring(1);
     }
   );
 
@@ -987,13 +967,6 @@ function startTimeRecord() {
   );
 
   enableMiddleM();
-
-  setTimeout(() => {
-
-    captureArea.scrollTop =
-      captureArea.scrollHeight;
-
-  }, 50);
 }
 
 function endTimeRecord() {
@@ -1213,7 +1186,7 @@ document.body.addEventListener(
       setTimeout(() => {
 
         if (
-          count === 3
+          count === 2
         ) {
 
           event.preventDefault();
@@ -1222,7 +1195,7 @@ document.body.addEventListener(
         }
 
         if (
-          count === 4
+          count === 3
         ) {
 
           event.preventDefault();
@@ -1234,16 +1207,6 @@ document.body.addEventListener(
   },
 
   { passive: false }
-);
-
-document.body.addEventListener(
-  "touchend",
-  () => {
-
-    clearTimeout(
-      touchTimer
-    );
-  }
 );
 
 document.addEventListener(
@@ -1279,20 +1242,11 @@ saveImageButton.addEventListener(
     saveImageButton.style.visibility =
       "hidden";
 
-    const oldOverflow =
-      captureArea.style.overflow;
-
-    const oldHeight =
+    const originalHeight =
       captureArea.style.height;
-
-    captureArea.style.overflow =
-      "visible";
 
     captureArea.style.height =
       "auto";
-
-    bottomArea.style.position =
-      "static";
 
     await new Promise(
       resolve =>
@@ -1301,43 +1255,61 @@ saveImageButton.addEventListener(
         )
     );
 
-    const fullHeight =
-      document.body.scrollHeight;
+    const clone =
+      document.body.cloneNode(true);
+
+    clone.style.height =
+      "auto";
+
+    clone.style.position =
+      "relative";
+
+    clone.style.overflow =
+      "visible";
+
+    const oldContainer =
+      document.createElement(
+        "div"
+      );
+
+    oldContainer.style.position =
+      "fixed";
+
+    oldContainer.style.left =
+      "-99999px";
+
+    oldContainer.appendChild(
+      clone
+    );
+
+    document.body.appendChild(
+      oldContainer
+    );
 
     const canvas =
       await html2canvas(
-        document.body,
+        clone,
         {
           backgroundColor:
             "#000",
 
           useCORS: true,
 
-          width:
-            document.body.scrollWidth,
-
-          height:
-            fullHeight,
+          scrollX: 0,
+          scrollY: 0,
 
           windowWidth:
-            document.body.scrollWidth,
+            clone.scrollWidth,
 
           windowHeight:
-            fullHeight,
-
-          scrollX: 0,
-          scrollY: 0
+            clone.scrollHeight
         }
       );
 
-    captureArea.style.overflow =
-      oldOverflow;
+    oldContainer.remove();
 
     captureArea.style.height =
-      oldHeight;
-
-    bottomArea.style.position =
-      "fixed";
+      originalHeight;
 
     saveImageButton.style.visibility =
       "visible";
