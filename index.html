@@ -1242,17 +1242,72 @@ saveImageButton.addEventListener(
     saveImageButton.style.visibility =
       "hidden";
 
-    const originalHeight =
-      captureArea.style.height;
+    const exportRoot =
+      document.createElement("div");
 
-    const originalPaddingBottom =
-      captureArea.style.paddingBottom;
+    exportRoot.style.background =
+      "#000";
 
-    captureArea.style.height =
+    exportRoot.style.color =
+      "#fff";
+
+    exportRoot.style.width =
+      captureArea.scrollWidth + "px";
+
+    exportRoot.style.paddingBottom =
+      "0px";
+
+    exportRoot.style.boxSizing =
+      "border-box";
+
+    const captureClone =
+      captureArea.cloneNode(true);
+
+    captureClone.style.height =
       "auto";
 
-    captureArea.style.paddingBottom =
+    captureClone.style.overflow =
+      "visible";
+
+    captureClone.style.paddingBottom =
       "0px";
+
+    const memoClone =
+      memoDisplay.cloneNode(true);
+
+    memoClone.style.marginTop =
+      "2px";
+
+    memoClone.style.marginBottom =
+      "0px";
+
+    exportRoot.appendChild(
+      captureClone
+    );
+
+    exportRoot.appendChild(
+      memoClone
+    );
+
+    const hidden =
+      document.createElement("div");
+
+    hidden.style.position =
+      "fixed";
+
+    hidden.style.left =
+      "-99999px";
+
+    hidden.style.top =
+      "0";
+
+    hidden.appendChild(
+      exportRoot
+    );
+
+    document.body.appendChild(
+      hidden
+    );
 
     await new Promise(
       resolve =>
@@ -1261,37 +1316,9 @@ saveImageButton.addEventListener(
         )
     );
 
-    const clone =
-      document.body.cloneNode(true);
-
-    clone.style.height =
-      "auto";
-
-    clone.style.overflow =
-      "visible";
-
-    const oldContainer =
-      document.createElement(
-        "div"
-      );
-
-    oldContainer.style.position =
-      "fixed";
-
-    oldContainer.style.left =
-      "-99999px";
-
-    oldContainer.appendChild(
-      clone
-    );
-
-    document.body.appendChild(
-      oldContainer
-    );
-
     const canvas =
       await html2canvas(
-        clone,
+        exportRoot,
         {
           backgroundColor:
             "#000",
@@ -1302,20 +1329,14 @@ saveImageButton.addEventListener(
           scrollY: 0,
 
           windowWidth:
-            clone.scrollWidth,
+            exportRoot.scrollWidth,
 
           windowHeight:
-            clone.scrollHeight
+            exportRoot.scrollHeight
         }
       );
 
-    oldContainer.remove();
-
-    captureArea.style.height =
-      originalHeight;
-
-    captureArea.style.paddingBottom =
-      originalPaddingBottom;
+    hidden.remove();
 
     saveImageButton.style.visibility =
       "visible";
