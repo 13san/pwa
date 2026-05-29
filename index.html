@@ -97,9 +97,13 @@ body {
 
   width: 100%;
 
-  height: 36px;
+  min-height: 60px;
 
   margin-top: 40px;
+
+  padding-top: 4px;
+
+  padding-bottom: 4px;
 }
 
 #dateText {
@@ -128,7 +132,15 @@ body {
 
   font-size: 1.45rem;
 
-  white-space: nowrap;
+  max-width: 60%;
+
+  text-align: center;
+
+  white-space: normal;
+
+  overflow-wrap: break-word;
+
+  line-height: 1.2;
 
   cursor: pointer;
 }
@@ -168,9 +180,9 @@ body {
 
   width: 100%;
 
-  height: 22px;
+  min-height: 28px;
 
-  margin-top: -1px;
+  margin-top: 4px;
 }
 
 #teamName {
@@ -237,22 +249,30 @@ body {
   align-items: center;
 
   margin-top: 2px;
+
+  gap: 12px;
 }
 
 .historyItem {
 
   font-size: 1.27rem;
 
-  line-height: 1.05;
-
-  white-space: nowrap;
+  line-height: 1.2;
 
   cursor: pointer;
+
+  overflow-wrap: break-word;
+
+  word-break: break-word;
+
+  flex: 1;
 }
 
 .peopleCount {
 
   width: 42px;
+
+  flex-shrink: 0;
 
   background: transparent;
 
@@ -612,6 +632,11 @@ const memoDisplay =
     "memoDisplay"
   );
 
+const bottomArea =
+  document.getElementById(
+    "bottomArea"
+  );
+
 const saveImageButton =
   document.getElementById(
     "saveImageButton"
@@ -836,13 +861,22 @@ function updateAllNumbers() {
           ".historyItem"
         );
 
+      const text =
+        item.textContent;
+
+      const removed =
+        text.replace(
+          /^[^\d]*?/,
+          ""
+        );
+
       item.textContent =
 
         getNumberText(index)
 
         +
 
-        item.textContent.substring(1);
+        removed;
     }
   );
 
@@ -953,6 +987,13 @@ function startTimeRecord() {
   );
 
   enableMiddleM();
+
+  setTimeout(() => {
+
+    captureArea.scrollTop =
+      captureArea.scrollHeight;
+
+  }, 50);
 }
 
 function endTimeRecord() {
@@ -1238,12 +1279,30 @@ saveImageButton.addEventListener(
     saveImageButton.style.visibility =
       "hidden";
 
+    const oldOverflow =
+      captureArea.style.overflow;
+
+    const oldHeight =
+      captureArea.style.height;
+
+    captureArea.style.overflow =
+      "visible";
+
+    captureArea.style.height =
+      "auto";
+
+    bottomArea.style.position =
+      "static";
+
     await new Promise(
       resolve =>
         requestAnimationFrame(
           resolve
         )
     );
+
+    const fullHeight =
+      document.body.scrollHeight;
 
     const canvas =
       await html2canvas(
@@ -1254,10 +1313,31 @@ saveImageButton.addEventListener(
 
           useCORS: true,
 
+          width:
+            document.body.scrollWidth,
+
+          height:
+            fullHeight,
+
+          windowWidth:
+            document.body.scrollWidth,
+
+          windowHeight:
+            fullHeight,
+
           scrollX: 0,
           scrollY: 0
         }
       );
+
+    captureArea.style.overflow =
+      oldOverflow;
+
+    captureArea.style.height =
+      oldHeight;
+
+    bottomArea.style.position =
+      "fixed";
 
     saveImageButton.style.visibility =
       "visible";
