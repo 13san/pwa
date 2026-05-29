@@ -1245,8 +1245,14 @@ saveImageButton.addEventListener(
     const originalHeight =
       captureArea.style.height;
 
+    const originalPaddingBottom =
+      captureArea.style.paddingBottom;
+
     captureArea.style.height =
       "auto";
+
+    captureArea.style.paddingBottom =
+      "0px";
 
     await new Promise(
       resolve =>
@@ -1260,9 +1266,6 @@ saveImageButton.addEventListener(
 
     clone.style.height =
       "auto";
-
-    clone.style.position =
-      "relative";
 
     clone.style.overflow =
       "visible";
@@ -1310,6 +1313,9 @@ saveImageButton.addEventListener(
 
     captureArea.style.height =
       originalHeight;
+
+    captureArea.style.paddingBottom =
+      originalPaddingBottom;
 
     saveImageButton.style.visibility =
       "visible";
